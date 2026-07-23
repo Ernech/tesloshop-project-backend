@@ -8,6 +8,7 @@ import * as bcrypt from 'bcrypt';
 import { User } from './entities/user.entity';
 import { LoginUserDto, CreateUserDto } from './dto';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
+import { RefreshToken } from './entities/refresh_tokens.entity';
 
 
 @Injectable()
@@ -16,7 +17,8 @@ export class AuthService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-
+    @InjectRepository(RefreshToken)
+    private readonly refreshTokenRepository:Repository<RefreshToken>,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -39,12 +41,30 @@ export class AuthService {
         user: user,
         token: this.getJwtToken({ id: user.id })
       };
-      // TODO: Retornar el JWT de acceso
 
     } catch (error) {
       this.handleDBErrors(error);
     }
 
+  }
+
+  async generateRefreshToken(user:User):Promise<string>{
+    try {
+      const expiresAt= new Date();
+      expiresAt.setDate(expiresAt.getDate()+7);
+
+      const token = this.getJwtToken({id:user.id},'7d')
+      const newRefrehToken = this.refreshTokenRepository.create({
+        token,
+        expiresAt,
+        user
+      })
+      await this.refreshTokenRepository.save(newRefrehToken);
+      return token;
+      
+    } catch (error) {
+      this.handleDBErrors(error);
+    }
   }
 
   async login( loginUserDto: LoginUserDto ) {
@@ -81,8 +101,8 @@ export class AuthService {
 
 
   
-  private getJwtToken( payload: JwtPayload ) {
-    const token = this.jwtService.sign( payload );
+  private getJwtToken( payload: JwtPayload, duration:string='30m' ) {
+    const token = this.jwtService.sign( payload,{ expiresIn: duration } );
     return token;
 
   }

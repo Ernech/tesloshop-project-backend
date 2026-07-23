@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, UseGuards, Req, Headers, SetMetadata } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, Req, Headers, SetMetadata, Res } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiTags } from '@nestjs/swagger';
 
@@ -12,13 +12,18 @@ import { CreateUserDto, LoginUserDto } from './dto';
 import { User } from './entities/user.entity';
 import { UserRoleGuard } from './guards/user-role.guard';
 import { ValidRoles } from './interfaces';
-
+import { Response } from 'express';
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-
+  private readonly cookieOptions = {
+    httpOnly: true,
+    secure: true, 
+    sameSite: 'strict' as const, 
+    maxAge: 7 * 24 * 60 * 60 * 1000, 
+  };
 
   @Post('register')
   createUser(@Body() createUserDto: CreateUserDto ) {
@@ -26,8 +31,11 @@ export class AuthController {
   }
 
   @Post('login')
-  loginUser(@Body() loginUserDto: LoginUserDto ) {
-    return this.authService.login( loginUserDto );
+  async loginUser(@Body() loginUserDto: LoginUserDto, @Res({ passthrough: true }) res: Response ) {
+    const loginResponse = await this.authService.login( loginUserDto );
+    const refreshToken = await this.authService.generateRefreshToken(loginResponse.user);
+    res.cookie('refreshToken',refreshToken,this.cookieOptions);
+    return loginResponse;
   }
 
   @Get('check-status')

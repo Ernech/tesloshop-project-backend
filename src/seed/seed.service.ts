@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ProductsService } from './../products/products.service';
 import { initialData } from './data/seed-data';
 import { User } from '../auth/entities/user.entity';
+import { RefreshToken } from 'src/auth/entities/refresh_tokens.entity';
 
 
 @Injectable()
@@ -13,15 +14,17 @@ export class SeedService {
     private readonly productsService: ProductsService,
 
     @InjectRepository( User )
-    private readonly userRepository: Repository<User>
+    private readonly userRepository: Repository<User>,
+     @InjectRepository( RefreshToken )
+    private readonly refreshTokenRepository: Repository<RefreshToken>
   ) {}
 
 
   async runSeed() {
 
     await this.deleteTables();
+   
     const adminUser = await this.insertUsers();
-
     await this.insertNewProducts( adminUser );
 
     return 'SEED EXECUTED';
@@ -30,26 +33,28 @@ export class SeedService {
   private async deleteTables() {
 
     await this.productsService.deleteAllProducts();
+    const refreshTokenQueryBuilder = this.refreshTokenRepository.createQueryBuilder();
+    await refreshTokenQueryBuilder.delete()
+      .execute();
 
     const queryBuilder = this.userRepository.createQueryBuilder();
     await queryBuilder
       .delete()
-      .where({})
       .execute()
 
   }
 
   private async insertUsers() {
-
-    const seedUsers = initialData.users;
     
+    const seedUsers = initialData.users;
     const users: User[] = [];
 
     seedUsers.forEach( user => {
       users.push( this.userRepository.create( user ) )
     });
+  
 
-    const dbUsers = await this.userRepository.save( seedUsers )
+    const dbUsers = await this.userRepository.save( users )
 
     return dbUsers[0];
   }
