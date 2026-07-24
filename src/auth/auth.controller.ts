@@ -57,6 +57,16 @@ export class AuthController {
     return {accessToken:newAccessToken}
   }
 
+  @Post('logout')
+  async logoutApp(@Req() req:Request){
+     const currentRefreshToken = req.cookies['refreshToken'];
+    if (!currentRefreshToken) {
+      throw new UnauthorizedException('No se proporcionó un Refresh Token');
+    }
+    await this.authService.revokeRefreshToken(currentRefreshToken);
+    return {"Message":"Log out exitoso"}
+  }
+
   @Get('private')
   @UseGuards( AuthGuard() )
   testingPrivateRoute(

@@ -110,6 +110,10 @@ export class AuthService {
 
   }
 
+  async revokeRefreshToken(token: string) {
+    await this.refreshTokenRepository.update({ token }, { isActive: false });
+  }
+
   async checkAuthStatus( user: User ){
 
     return {
