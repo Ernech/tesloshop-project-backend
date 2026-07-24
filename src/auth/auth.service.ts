@@ -90,6 +90,26 @@ export class AuthService {
     };
   }
 
+  async refreshAccessToken(refreshToken:string){
+   const payload= this.jwtService.verify(refreshToken);
+
+    const storedToken = await this.refreshTokenRepository.findOne({
+      where:{token:refreshToken,isActive:true},
+      relations:['user']
+    })
+    if(!storedToken || storedToken.expiresAt<new Date()){
+      throw new UnauthorizedException("Refreh token no válido")
+
+    }
+    storedToken.isActive=false;
+    await this.refreshTokenRepository.save(storedToken);
+    //Generate new Token
+    const newAccessToken = this.getJwtToken(payload);
+    const newRefreshToken = await this.generateRefreshToken(storedToken.user);
+    return {newAccessToken,newRefreshToken};
+
+  }
+
   async checkAuthStatus( user: User ){
 
     return {

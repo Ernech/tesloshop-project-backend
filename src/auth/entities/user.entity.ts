@@ -6,7 +6,7 @@ import { RefreshToken } from './refresh_tokens.entity';
 @Entity('users')
 export class User {
     
-    @PrimaryGeneratedColumn('uuid')
+    @PrimaryGeneratedColumn('uuid',{name:'user_id'})
     id: string;
 
     @Column('text', {

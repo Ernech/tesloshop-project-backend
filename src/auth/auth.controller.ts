@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, UseGuards, Req, Headers, SetMetadata, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, Req, Headers, SetMetadata, Res, UnauthorizedException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiTags } from '@nestjs/swagger';
 
@@ -12,7 +12,7 @@ import { CreateUserDto, LoginUserDto } from './dto';
 import { User } from './entities/user.entity';
 import { UserRoleGuard } from './guards/user-role.guard';
 import { ValidRoles } from './interfaces';
-import { Response } from 'express';
+import { Response,Request } from 'express';
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
@@ -46,6 +46,16 @@ export class AuthController {
     return this.authService.checkAuthStatus( user );
   }
 
+  @Post('refresh')
+  async refreshSession(@Req() req:Request,@Res({passthrough:true}) res:Response){
+    const currentRefreshToken = req.cookies['refreshToken'];
+    if (!currentRefreshToken) {
+      throw new UnauthorizedException('No se proporcionó un Refresh Token');
+    }
+    const {newAccessToken,newRefreshToken} = await this.authService.refreshAccessToken(currentRefreshToken);
+    res.cookie('refreshToken',newRefreshToken,this.cookieOptions);
+    return {accessToken:newAccessToken}
+  }
 
   @Get('private')
   @UseGuards( AuthGuard() )

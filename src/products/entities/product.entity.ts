@@ -12,7 +12,7 @@ export class Product {
         description: 'Product ID',
         uniqueItems: true
     })
-    @PrimaryGeneratedColumn('uuid')
+    @PrimaryGeneratedColumn('uuid',{name:'product_id'})
     id: string;
 
     @ApiProperty({
