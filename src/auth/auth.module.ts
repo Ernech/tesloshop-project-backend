@@ -29,7 +29,7 @@ import { RefreshToken } from './entities/refresh_tokens.entity';
         return {
           secret: configService.get('JWT_SECRET'),
           signOptions: {
-            expiresIn:'2h'
+            expiresIn:'30m'
           }
         }
       }

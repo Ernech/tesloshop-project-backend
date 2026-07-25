@@ -9,6 +9,7 @@ import { User } from './entities/user.entity';
 import { LoginUserDto, CreateUserDto } from './dto';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { RefreshToken } from './entities/refresh_tokens.entity';
+import { randomBytes } from 'crypto';
 
 
 @Injectable()
@@ -53,7 +54,7 @@ export class AuthService {
       const expiresAt= new Date();
       expiresAt.setDate(expiresAt.getDate()+7);
 
-      const token = this.getJwtToken({id:user.id},'7d')
+      const token = this.generateSecureString();
       const newRefrehToken = this.refreshTokenRepository.create({
         token,
         expiresAt,
@@ -65,6 +66,16 @@ export class AuthService {
     } catch (error) {
       this.handleDBErrors(error);
     }
+  }
+
+  private generateSecureString(
+    byteLength: number = 32, 
+    encoding: 'hex' | 'base64' | 'base64url' = 'hex'
+  ): string {
+   
+    const buffer = randomBytes(byteLength);
+    
+    return buffer.toString(encoding);
   }
 
   async login( loginUserDto: LoginUserDto ) {
@@ -91,22 +102,28 @@ export class AuthService {
   }
 
   async refreshAccessToken(refreshToken:string){
-   const payload= this.jwtService.verify(refreshToken);
-
+   
     const storedToken = await this.refreshTokenRepository.findOne({
       where:{token:refreshToken,isActive:true},
-      relations:['user']
+      relations: { 
+        user: true // <-- Formato de objeto booleano fuertemente tipado
+      }
     })
     if(!storedToken || storedToken.expiresAt<new Date()){
       throw new UnauthorizedException("Refreh token no válido")
 
     }
-    storedToken.isActive=false;
-    await this.refreshTokenRepository.save(storedToken);
-    //Generate new Token
-    const newAccessToken = this.getJwtToken(payload);
-    const newRefreshToken = await this.generateRefreshToken(storedToken.user);
-    return {newAccessToken,newRefreshToken};
+    try {
+      storedToken.isActive=false;
+      await this.refreshTokenRepository.save(storedToken);
+      //Generate new Token
+      const newAccessToken = this.getJwtToken({id:storedToken.user.id});
+      const newRefreshToken = await this.generateRefreshToken(storedToken.user);
+      return {newAccessToken,newRefreshToken};
+    } catch (error) {
+      this.handleDBErrors(error);
+    }
+   
 
   }
 
@@ -125,8 +142,8 @@ export class AuthService {
 
 
   
-  private getJwtToken( payload: JwtPayload, duration:string='30m' ) {
-    const token = this.jwtService.sign( payload,{ expiresIn: duration } );
+  private getJwtToken( payload: JwtPayload) {
+    const token = this.jwtService.sign( payload );
     return token;
 
   }
