@@ -10,6 +10,8 @@ import { LoginUserDto, CreateUserDto } from './dto';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { RefreshToken } from './entities/refresh_tokens.entity';
 import { randomBytes } from 'crypto';
+import { LoginResponseDto, UserProfileDto } from './dto/login-user.dto';
+import { use } from 'passport';
 
 
 @Injectable()
@@ -49,7 +51,7 @@ export class AuthService {
 
   }
 
-  async generateRefreshToken(user:User):Promise<string>{
+  async generateRefreshToken(user:UserProfileDto):Promise<string>{
     try {
       const expiresAt= new Date();
       expiresAt.setDate(expiresAt.getDate()+7);
@@ -78,7 +80,7 @@ export class AuthService {
     return buffer.toString(encoding);
   }
 
-  async login( loginUserDto: LoginUserDto ) {
+  async login( loginUserDto: LoginUserDto ):Promise<LoginResponseDto> {
 
     const { password, email } = loginUserDto;
 
@@ -88,15 +90,19 @@ export class AuthService {
     });
 
     if ( !user ) 
-      throw new UnauthorizedException('Credentials are not valid (email)');
+      throw new UnauthorizedException('Credentials are not valid');
       
     if ( !bcrypt.compareSync( password, user.password ) )
-      throw new UnauthorizedException('Credentials are not valid (password)');
-
-    delete user.password;
+      throw new UnauthorizedException('Credentials are not valid');
 
     return {
-      user: user,
+      user: {
+        id: user.id,
+        fullName:user.fullName,
+        email: user.email,
+        roles:user.roles,
+        isActive:user.isActive,
+      },
       token: this.getJwtToken({ id: user.id })
     };
   }
@@ -106,11 +112,11 @@ export class AuthService {
     const storedToken = await this.refreshTokenRepository.findOne({
       where:{token:refreshToken,isActive:true},
       relations: { 
-        user: true // <-- Formato de objeto booleano fuertemente tipado
+        user: true
       }
     })
     if(!storedToken || storedToken.expiresAt<new Date()){
-      throw new UnauthorizedException("Refreh token no válido")
+      throw new UnauthorizedException("Refreh token invalid")
 
     }
     try {

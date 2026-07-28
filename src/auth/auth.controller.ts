@@ -1,6 +1,6 @@
-import { Controller, Get, Post, Body, UseGuards, Req, Headers, SetMetadata, Res, UnauthorizedException } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, Req, Headers, SetMetadata, Res, UnauthorizedException, HttpCode, HttpStatus } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOkResponse, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { IncomingHttpHeaders } from 'http';
 
@@ -13,6 +13,7 @@ import { User } from './entities/user.entity';
 import { UserRoleGuard } from './guards/user-role.guard';
 import { ValidRoles } from './interfaces';
 import { Response,Request } from 'express';
+import { LoginResponseDto } from './dto/login-user.dto';
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
@@ -30,6 +31,12 @@ export class AuthController {
     return this.authService.create( createUserDto );
   }
 
+  @Post('login')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'User Login', description: 'Authenticates a user and returns a JWT token.' })
+  @ApiBody({ type: LoginUserDto }) 
+  @ApiResponse({ status: 200, description: 'Success', type:LoginResponseDto })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   @Post('login')
   async loginUser(@Body() loginUserDto: LoginUserDto, @Res({ passthrough: true }) res: Response ) {
     const loginResponse = await this.authService.login( loginUserDto );
@@ -50,7 +57,7 @@ export class AuthController {
   async refreshSession(@Req() req:Request,@Res({passthrough:true}) res:Response){
     const currentRefreshToken = req.cookies['refreshToken'];
     if (!currentRefreshToken) {
-      throw new UnauthorizedException('No se proporcionó un Refresh Token');
+      throw new UnauthorizedException('Refresh TOken Not Found');
     }
     const {newAccessToken,newRefreshToken} = await this.authService.refreshAccessToken(currentRefreshToken);
     res.cookie('refreshToken',newRefreshToken,this.cookieOptions);
@@ -61,7 +68,7 @@ export class AuthController {
   async logoutApp(@Req() req:Request){
      const currentRefreshToken = req.cookies['refreshToken'];
     if (!currentRefreshToken) {
-      throw new UnauthorizedException('No se proporcionó un Refresh Token');
+      throw new UnauthorizedException('Refresh TOken Not Found');
     }
     await this.authService.revokeRefreshToken(currentRefreshToken);
     return {"Message":"Log out exitoso"}
