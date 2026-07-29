@@ -26,7 +26,7 @@ export class AuthService {
   ) {}
 
 
-  async create( createUserDto: CreateUserDto) {
+  async create( createUserDto: CreateUserDto):Promise<LoginResponseDto> {
     
     try {
 

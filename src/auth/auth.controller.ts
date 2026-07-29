@@ -14,6 +14,7 @@ import { UserRoleGuard } from './guards/user-role.guard';
 import { ValidRoles } from './interfaces';
 import { Response,Request } from 'express';
 import { LoginResponseDto } from './dto/login-user.dto';
+import { RefreshSessionDTO } from './dto/refresh-session.dto';
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
@@ -27,16 +28,23 @@ export class AuthController {
   };
 
   @Post('register')
-  createUser(@Body() createUserDto: CreateUserDto ) {
-    return this.authService.create( createUserDto );
+  @HttpCode(HttpStatus.CREATED)
+  @ApiBody({type:CreateUserDto})
+  @ApiResponse({ status: 201, description: 'Created', type:LoginResponseDto })
+  @ApiResponse({ status: 400, description: 'Bad Request' })
+  @ApiResponse({ status: 500, description: 'Internal Server Error' })
+  @ApiOperation({ summary: 'Register User', description: 'Creates a new user and returns a JWT token and user profile.' })
+  async createUser(@Body() createUserDto: CreateUserDto ) {
+    return await this.authService.create( createUserDto );
   }
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'User Login', description: 'Authenticates a user and returns a JWT token.' })
+  @ApiOperation({ summary: 'User Login', description: 'Authenticates a user and returns a JWT token and user profile.' })
   @ApiBody({ type: LoginUserDto }) 
   @ApiResponse({ status: 200, description: 'Success', type:LoginResponseDto })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 500, description: 'Internal Server Error' })
   @Post('login')
   async loginUser(@Body() loginUserDto: LoginUserDto, @Res({ passthrough: true }) res: Response ) {
     const loginResponse = await this.authService.login( loginUserDto );
@@ -54,10 +62,15 @@ export class AuthController {
   }
 
   @Post('refresh')
+  @ApiOperation({ summary: 'Refresh Session', description: 'Refresh user session and returns a new JWT token.' })
+  @HttpCode(HttpStatus.CREATED)
+  @ApiResponse({ status: 201, description: 'Created', type:RefreshSessionDTO })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 500, description: 'Internal Server Error' })
   async refreshSession(@Req() req:Request,@Res({passthrough:true}) res:Response){
     const currentRefreshToken = req.cookies['refreshToken'];
     if (!currentRefreshToken) {
-      throw new UnauthorizedException('Refresh TOken Not Found');
+      throw new UnauthorizedException('Refresh Token Not Found');
     }
     const {newAccessToken,newRefreshToken} = await this.authService.refreshAccessToken(currentRefreshToken);
     res.cookie('refreshToken',newRefreshToken,this.cookieOptions);
@@ -65,13 +78,17 @@ export class AuthController {
   }
 
   @Post('logout')
+  @ApiOperation({ summary: 'Logout', description: 'Ends the current user session and revokes the tokens.' })
+  @ApiResponse({ status: 200, description: 'Created' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 500, description: 'Internal Server Error' })
   async logoutApp(@Req() req:Request){
      const currentRefreshToken = req.cookies['refreshToken'];
     if (!currentRefreshToken) {
-      throw new UnauthorizedException('Refresh TOken Not Found');
+      throw new UnauthorizedException('Refresh Token Not Found');
     }
     await this.authService.revokeRefreshToken(currentRefreshToken);
-    return {"Message":"Log out exitoso"}
+    return {"Message":"Succesfully Logout"}
   }
 
   @Get('private')
