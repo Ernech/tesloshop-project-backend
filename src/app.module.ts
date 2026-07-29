@@ -11,6 +11,7 @@ import { SeedModule } from './seed/seed.module';
 import { FilesModule } from './files/files.module';
 import { AuthModule } from './auth/auth.module';
 import { MessagesWsModule } from './messages-ws/messages-ws.module';
+import { OrdersModule } from './orders/orders.module';
 
 @Module({
   imports: [
@@ -30,7 +31,7 @@ import { MessagesWsModule } from './messages-ws/messages-ws.module';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,      
       autoLoadEntities: true,
-      synchronize: true,
+      synchronize: false, //TODO: Devolverlo a true, cuando los schemas estén completos
     }),
 
     ServeStaticModule.forRoot({
@@ -48,6 +49,8 @@ import { MessagesWsModule } from './messages-ws/messages-ws.module';
     AuthModule,
 
     MessagesWsModule,
+
+    OrdersModule,
 
   ],
 })
