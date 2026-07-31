@@ -12,11 +12,20 @@ import { FilesModule } from './files/files.module';
 import { AuthModule } from './auth/auth.module';
 import { MessagesWsModule } from './messages-ws/messages-ws.module';
 import { OrdersModule } from './orders/orders.module';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
-
+    ThrottlerModule.forRoot({
+      throttlers:[
+        {
+          ttl: 60000,
+          limit: 10,
+        }
+      ]
+    }),
     TypeOrmModule.forRoot({
       ssl: process.env.STAGE === 'prod',
       extra: {
@@ -53,5 +62,11 @@ import { OrdersModule } from './orders/orders.module';
     OrdersModule,
 
   ],
+  providers:[
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard
+    }
+  ]
 })
 export class AppModule {}

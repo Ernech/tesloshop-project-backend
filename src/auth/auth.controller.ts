@@ -15,6 +15,7 @@ import { ValidRoles } from './interfaces';
 import { Response,Request } from 'express';
 import { LoginResponseDto } from './dto/login-user.dto';
 import { RefreshSessionDTO } from './dto/refresh-session.dto';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
@@ -44,8 +45,10 @@ export class AuthController {
   @ApiBody({ type: LoginUserDto }) 
   @ApiResponse({ status: 200, description: 'Success', type:LoginResponseDto })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({status:HttpStatus.TOO_MANY_REQUESTS,description:"Too many requests. Rate limit exceded"})
   @ApiResponse({ status: 500, description: 'Internal Server Error' })
-  @Post('login')
+  @Throttle({ default: { limit: 5, ttl: 900000 } })
   async loginUser(@Body() loginUserDto: LoginUserDto, @Res({ passthrough: true }) res: Response ) {
     const loginResponse = await this.authService.login( loginUserDto );
     const refreshToken = await this.authService.generateRefreshToken(loginResponse.user);
@@ -67,6 +70,7 @@ export class AuthController {
   @ApiResponse({ status: 201, description: 'Created', type:RefreshSessionDTO })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 500, description: 'Internal Server Error' })
+  @Throttle({ default: { limit: 30, ttl: 60000 } })
   async refreshSession(@Req() req:Request,@Res({passthrough:true}) res:Response){
     const currentRefreshToken = req.cookies['refreshToken'];
     if (!currentRefreshToken) {
