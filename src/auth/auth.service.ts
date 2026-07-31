@@ -115,6 +115,7 @@ export class AuthService {
     //Succesfull login, reset the counter 
     user.loginAttempts = 0;
     user.blockUntil = null;
+    user.lastLoginAt = new Date();
     await this.userRepository.save(user);
     
 
