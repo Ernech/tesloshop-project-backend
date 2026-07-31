@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -89,11 +89,34 @@ export class AuthService {
       select: { email: true, password: true, id: true, fullName: true, isActive: true, roles: true}
     });
 
-    if ( !user ) 
-      throw new UnauthorizedException('Credentials are not valid');
+    //Check if account is currently blocked
+    if(user.blockUntil && user.blockUntil> new Date()){
+       const minutesLeft = Math.ceil((user.blockUntil.getTime() - new Date().getTime()) / 60000);
+       throw new ForbiddenException(`Account temporarily locked. Try again in ${minutesLeft} minutes.`);
+    }
       
-    if ( !bcrypt.compareSync( password, user.password ) )
-      throw new UnauthorizedException('Credentials are not valid');
+    if ( !user ){
+      throw new UnauthorizedException('Incorrect credentials');
+    } 
+     //If password is incorrect add a new login attempt 
+    if ( !bcrypt.compareSync( password, user.password ) ){
+      user.loginAttempts+=1;
+      //check if login attepmts is greater than 5
+      if(user.loginAttempts>=5){
+        //Temporary Block account
+         const lockDate = new Date();
+          lockDate.setMinutes(lockDate.getMinutes() + 15);
+          user.blockUntil = lockDate;
+      }
+      await this.userRepository.save(user);
+      throw new UnauthorizedException('Incorrect credentials');
+    }
+
+    //Succesfull login, reset the counter 
+    user.loginAttempts = 0;
+    user.blockUntil = null;
+    await this.userRepository.save(user);
+    
 
     return {
       user: {

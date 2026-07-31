@@ -1,5 +1,6 @@
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { OrderItem } from "./order-item.entity";
+import { User } from "src/auth/entities/user.entity";
 
 @Entity('order')
 export class Order{
@@ -22,10 +23,9 @@ export class Order{
     @CreateDateColumn({ type: 'timestamp with time zone', name: 'created_at' })
     createdAt: Date;
 
-    //TODO: Modificar la entidad de users
 
-    //  @ManyToOne(() => User, (user) => user.orders, { onDelete: 'CASCADE' })
-    // user: User;
+    @ManyToOne(() => User, (user) => user.orders, { onDelete: 'CASCADE' })
+    user: User;
 
     // Relación con los productos comprados
     @OneToMany(() => OrderItem, (item) => item.order, { cascade: true })
