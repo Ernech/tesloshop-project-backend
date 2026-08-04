@@ -98,35 +98,31 @@ export class Product {
     images?: ProductImage[];
 
 
-    @ManyToOne(
-        () => User,
-        ( user ) => user.product,
-        { eager: true }
-    )
-    user: User
-
-
     @BeforeInsert()
-    checkSlugInsert() {
+  checkSlugInsert() {
+      if ( !this.slug ) {
+          this.slug = this.title;
+      }
+      this.sanitizeSlug();
+  }
 
-        if ( !this.slug ) {
-            this.slug = this.title;
-        }
+  @BeforeUpdate()
+  checkSlugUpdate() {
+     
+      if ( !this.slug ) {
+          this.slug = this.title;
+      }
+      this.sanitizeSlug();
+  }
 
-        this.slug = this.slug
-            .toLowerCase()
-            .replaceAll(' ','_')
-            .replaceAll("'",'')
-
-    }
-
-    @BeforeUpdate()
-    checkSlugUpdate() {
-        this.slug = this.slug
-            .toLowerCase()
-            .replaceAll(' ','_')
-            .replaceAll("'",'')
-    }
-
+  
+  private sanitizeSlug() {
+      this.slug = this.slug
+        .toLowerCase()
+        .trim()
+        .replaceAll(' ', '-') 
+        .replaceAll('_', '-') 
+        .replaceAll("'", '');
+  }
 
 }
