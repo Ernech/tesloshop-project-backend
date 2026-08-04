@@ -1,4 +1,4 @@
-import { BeforeInsert, BeforeUpdate, Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 
 import { ProductImage } from './';
@@ -81,13 +81,32 @@ export class Product {
     @Column('text')
     gender: string;
 
-    @ApiProperty()
+    @ApiProperty({
+        description: 'Search keywords and filter labels used to group products and improve searchability across the store',
+        example: ['shirt', 'apparel', 'classic', 'tesla'],
+    })
     @Column('text', {
         array: true,
         default: []
     })
     tags: string[];
+    
+    @ApiProperty({ readOnly: true, example: '2026-08-03T20:15:00.000Z' })
+    @CreateDateColumn({
+        name: 'created_at',
+        type: 'timestamp', 
+        default: () => 'CURRENT_TIMESTAMP'
+    })
+    createdAt: Date;
 
+    @ApiProperty({ readOnly: true, example: '2026-08-03T20:15:00.000Z' })
+    @CreateDateColumn({
+        name: 'updated_at',
+        type: 'timestamp',
+        default: () => 'CURRENT_TIMESTAMP',
+        onUpdate:'CURRENT_TIMESTAMP'
+    })
+    updatedAt: Date;
     // images
     @ApiProperty()
     @OneToMany(
