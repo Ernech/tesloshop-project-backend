@@ -40,7 +40,7 @@ import { APP_GUARD } from '@nestjs/core';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,      
       autoLoadEntities: true,
-      synchronize: false, //TODO: Devolverlo a true, cuando los schemas estén completos
+      synchronize: true, 
     }),
 
     ServeStaticModule.forRoot({
