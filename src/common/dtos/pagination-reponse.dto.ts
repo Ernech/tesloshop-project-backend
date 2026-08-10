@@ -1,4 +1,5 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { applyDecorators, Type } from "@nestjs/common";
+import { ApiOkResponse, ApiProperty, getSchemaPath } from "@nestjs/swagger";
 
 export class PaginatedResponseDTO<T>{
     @ApiProperty({description:'Number of the current page'})
@@ -9,7 +10,27 @@ export class PaginatedResponseDTO<T>{
 
     @ApiProperty({description:"Number of total pages"})
     totalPages:number;
-
-    @ApiProperty({description:"Array of items"})
+    
     items:T[]
+}
+
+export function ApiPaginatedResponse<TModel extends Type<any>>(model: TModel) {
+  return applyDecorators(
+    ApiOkResponse({
+      schema: {
+        title: `PaginatedResponseOf${model.name}`,
+        allOf: [
+          { $ref: getSchemaPath(PaginatedResponseDTO) },
+          {
+            properties: {
+              items: {
+                type: 'array',
+                items: { $ref: getSchemaPath(model) }, // Points directly to GetOrderDTO properties
+              },
+            },
+          },
+        ],
+      },
+    }),
+  );
 }

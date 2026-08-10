@@ -4,6 +4,8 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 import { AppModule } from './app.module';
 import cookieParser from 'cookie-parser';
+import { PaginatedResponseDTO } from './common/dtos/pagination-reponse.dto';
+import { GetOrderDTO } from './orders/dto/orders.dto';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -25,7 +27,7 @@ async function bootstrap() {
     .setDescription('Teslo shop endpoints')
     .setVersion('1.0')
     .build();
-  const document = SwaggerModule.createDocument(app, config);
+  const document = SwaggerModule.createDocument(app, config,{extraModels: [PaginatedResponseDTO, GetOrderDTO]});
   SwaggerModule.setup('api', app, document);
 
 

@@ -1,6 +1,7 @@
 import { User } from "src/auth/entities/user.entity";
-import { Column, CreateDateColumn, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
+@Entity('addresses')
 export class AddressEntity{
 
     @PrimaryGeneratedColumn('uuid', {name:'address_id'})
