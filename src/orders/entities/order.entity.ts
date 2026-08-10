@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { OrderItem } from "./order-item.entity";
 import { User } from "src/auth/entities/user.entity";
 import { OrderStatus } from "../enums/order-status.enum";
@@ -26,6 +26,7 @@ export class Order{
 
 
     @ManyToOne(() => User, (user) => user.orders, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'user_id' ,referencedColumnName:"id"}) 
     user: User;
 
     // Relación con los productos comprados
