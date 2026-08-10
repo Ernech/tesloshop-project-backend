@@ -1,6 +1,7 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { OrderItem } from "./order-item.entity";
 import { User } from "src/auth/entities/user.entity";
+import { OrderStatus } from "../enums/order-status.enum";
 
 @Entity('order')
 export class Order{
@@ -11,11 +12,11 @@ export class Order{
     @Column('numeric', { name:'total', precision: 10, scale: 2 })
     total: number;
 
-    @Column('text', { default: 'PENDING' }) // PENDING, PAID, SHIPPED, CANCELLED
-    status: string;
+    @Column({type:"enum",enum:OrderStatus, default: OrderStatus.PENDING }) 
+    status: OrderStatus;
 
-    @Column('jsonb') // 👈 Aquí congelas la dirección de envío en el momento de la compra
-    shippingAddress: any;
+    @Column('text',{name:'shipping_address'}) 
+    shippingAddress: string;
 
     @Column('text', { nullable: true, name: 'stripe_charge_id' }) // ID de transacción de Stripe
     stripeChargeId: string;
