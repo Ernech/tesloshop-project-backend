@@ -1,4 +1,5 @@
-import { Column, CreateDateColumn, PrimaryGeneratedColumn } from "typeorm";
+import { User } from "src/auth/entities/user.entity";
+import { Column, CreateDateColumn, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 export class AddressEntity{
 
@@ -22,6 +23,10 @@ export class AddressEntity{
 
     @Column('boolean',{name:'is_default',default:false})
     isDefault:boolean;
+
+    @ManyToOne(()=>User,(user)=>user.addresses, { onDelete:'CASCADE' })
+    @JoinColumn({name:'user_id',referencedColumnName:'id'})
+    user:User;
 
     @CreateDateColumn({ type: 'timestamp with time zone', name: 'created_at' })
     createdAt: Date;

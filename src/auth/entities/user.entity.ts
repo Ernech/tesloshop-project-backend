@@ -2,6 +2,7 @@ import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany, PrimaryGenerated
 import { Product } from '../../products/entities';
 import { RefreshToken } from './refresh_tokens.entity';
 import { Order } from 'src/orders/entities/order.entity';
+import { AddressEntity } from 'src/orders/entities/address.entity';
 
 
 @Entity('users')
@@ -55,6 +56,9 @@ export class User {
 
     @OneToMany(()=>RefreshToken,(refreshToken)=>refreshToken.user)
     refreshToken:RefreshToken;
+
+    @OneToMany(()=>AddressEntity,(addressEntity)=>addressEntity.user)
+    addresses:AddressEntity[];
 
     @BeforeInsert()
     checkFieldsBeforeInsert() {
