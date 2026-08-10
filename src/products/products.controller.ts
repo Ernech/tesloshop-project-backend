@@ -15,11 +15,12 @@ import { Product } from './entities/product.entity';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { PaginationDto } from './../common/dtos/pagination.dto';
 
 import { Auth, GetUser } from '../auth/decorators';
 import { User } from '../auth/entities/user.entity';
 import { ValidRoles } from '../auth/interfaces';
+import { ProductPaginationDto } from './dto/product-pagination.dto';
+
 
 @ApiTags('Products')
 @Controller('products')
@@ -40,7 +41,7 @@ export class ProductsController {
   }
 
   @Get()
-  findAll(@Query() paginationDto: PaginationDto) {
+  findAll(@Query() paginationDto: ProductPaginationDto) {
     // console.log(paginationDto)
     return this.productsService.findAll(paginationDto);
   }

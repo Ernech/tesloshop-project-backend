@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsOptional, IsPositive, Min } from 'class-validator';
 
-export class PaginationDto {
+export class BasePaginationDto {
   @ApiProperty({
     default: 10,
     description: 'How many rows do you need',
@@ -22,10 +22,6 @@ export class PaginationDto {
   @Type(() => Number) // enableImplicitConversions: true
   offset?: number;
 
-  @ApiProperty({
-    default: '',
-    description: 'Filter results by gender',
-  })
-  @IsOptional()
-  gender: 'men' | 'women' | 'unisex' | 'kid';
+ 
 }
+

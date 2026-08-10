@@ -10,11 +10,10 @@ import { DataSource, Repository } from 'typeorm';
 
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { PaginationDto } from 'src/common/dtos/pagination.dto';
 
 import { validate as isUUID } from 'uuid';
 import { ProductImage, Product } from './entities';
-import { User } from '../auth/entities/user.entity';
+import { ProductPaginationDto } from './dto/product-pagination.dto';
 
 @Injectable()
 export class ProductsService {
@@ -50,7 +49,7 @@ export class ProductsService {
     }
   }
 
-  async findAll(paginationDto: PaginationDto) {
+  async findAll(paginationDto: ProductPaginationDto) {
     const { limit = 10, offset = 0, gender = '' } = paginationDto;
 
     const products = await this.productRepository.find({

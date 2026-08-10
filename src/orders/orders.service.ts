@@ -4,7 +4,8 @@ import { Order } from './entities/order.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/auth/entities/user.entity';
 import { GetOrderDTO } from './dto/orders.dto';
-import { PaginatedResponseDTO } from 'src/common/dtos/pagination-reponse.dt';
+import { PaginatedResponseDTO } from 'src/common/dtos/pagination-reponse.dto';
+import { OrdersPaginationDto } from './dto/orders-pagination.dto';
 
 @Injectable()
 export class OrdersService {
@@ -12,9 +13,10 @@ export class OrdersService {
     constructor(@InjectRepository(Order) private readonly ordersRepository:Repository<Order>){}
 
 
-    async getUserOrders(user:User, page: number = 1, limit: number = 10):Promise<PaginatedResponseDTO<GetOrderDTO>>{
+    async getUserOrders(user:User, orderPaginationDto:OrdersPaginationDto):Promise<PaginatedResponseDTO<GetOrderDTO>>{
         try {
-            const skip = (page-1) *limit;
+            const {limit,offset} = orderPaginationDto;
+            const skip = (offset-1) *limit;
             const [orders,totalCount] = await this.ordersRepository.createQueryBuilder('order')
             .select([
                 'order.id',
@@ -38,7 +40,7 @@ export class OrdersService {
                 }));
 
           return {
-            pageNumber: page,
+            pageNumber: offset,
             pageSize: limit,
             totalPages,
             items,
