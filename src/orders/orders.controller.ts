@@ -1,6 +1,6 @@
 import { Controller, Get, ParseIntPipe, Query } from '@nestjs/common';
 import { OrdersService } from './orders.service';
-import { GetUser } from 'src/auth/decorators';
+import { Auth, GetUser } from 'src/auth/decorators';
 import { User } from 'src/auth/entities/user.entity';
 import { OrdersPaginationDto } from './dto/orders-pagination.dto';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
@@ -15,10 +15,13 @@ export class OrdersController {
   @ApiPaginatedResponse(GetOrderDTO)
   @ApiResponse({status:400, description: 'Bad Request'})
   @ApiResponse({status:500, description:'Internal Server Error'})
+  @Auth()
   @Get()
   async getUserOrders(  
     @GetUser() user:User,
     @Query() orderPaginationDto:OrdersPaginationDto):Promise<PaginatedResponseDTO<GetOrderDTO>>{
       return this.ordersService.getUserOrders(user,orderPaginationDto);
     }
+
+  
 }

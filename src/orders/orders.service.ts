@@ -59,7 +59,7 @@ export class OrdersService {
            const order = await this.ordersRepository
                     .createQueryBuilder('order')
                     .innerJoin('order.user', 'user')
-                    .innerJoinAndSelect('order.items', 'orderItem') // Pulls quantity, price, and productName in one join!
+                    .innerJoinAndSelect('order.items', 'orderItem') 
                     .select([
                         'order.id',
                         'order.total',
