@@ -19,7 +19,9 @@ export class GetOrderDTO{
     orderCreationDate:Date;
 
 }
+
 export class OrderItemDto{
+
     @ApiProperty({description:"Order Item Id", example:"6e3ae4f7-ff71-4ebf-8bda-a280b70142e6"})
     id:string;
 
@@ -37,6 +39,6 @@ export class OrderItemDto{
 export class GetOrderDetailDto extends GetOrderDTO{
 
     @ApiProperty({ type: [OrderItemDto] })
-    orderItem:OrderItemDto[]
+    orderItems:OrderItemDto[]
 }
 

@@ -1,9 +1,9 @@
-import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from './entities/order.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/auth/entities/user.entity';
-import { GetOrderDTO } from './dto/orders.dto';
+import { GetOrderDetailDto, GetOrderDTO } from './dto/orders.dto';
 import { PaginatedResponseDTO } from 'src/common/dtos/pagination-reponse.dto';
 import { OrdersPaginationDto } from './dto/orders-pagination.dto';
 
@@ -18,6 +18,7 @@ export class OrdersService {
             const {limit,offset} = orderPaginationDto;
             const skip = (offset-1) *limit;
             const [orders,totalCount] = await this.ordersRepository.createQueryBuilder('order')
+            .innerJoin('order.user', 'user')
             .select([
                 'order.id',
                 'order.total',
@@ -50,6 +51,48 @@ export class OrdersService {
             this.handleDBErrors(error);
         }
 
+    }
+
+
+    async GetOrderDetail(user:User, orderId:string):Promise<GetOrderDetailDto>{
+        try {
+           const order = await this.ordersRepository
+                    .createQueryBuilder('order')
+                    .innerJoin('order.user', 'user')
+                    .innerJoinAndSelect('order.items', 'orderItem') // Pulls quantity, price, and productName in one join!
+                    .select([
+                        'order.id',
+                        'order.total',
+                        'order.status',
+                        'order.shippingAddress',
+                        'order.createdAt',
+                        'orderItem.productId',
+                        'orderItem.productName',
+                        'orderItem.quantity',
+                        'orderItem.price',
+                    ])
+                    .where('order.id = :orderId', { orderId })
+                    .andWhere('user.id = :userId', { userId: user.id })
+                    .getOne();
+            if(!order){
+                throw new NotFoundException('Order not found');
+            }
+            return{
+                id:order.id,
+                total:order.total,
+                status:order.status,
+                shippingAddress:order.shippingAddress,
+                orderCreationDate:order.createdAt,
+                orderItems: order.items.map((orderItem)=>({
+                    id:orderItem.id,
+                    productName:orderItem.productName,
+                    price:orderItem.price,
+                    quantity:orderItem.quantity
+                }))
+            }
+        } catch (error) {
+            this.handleDBErrors(error)
+        }
     }
 
      private handleDBErrors( error: any ): never {
