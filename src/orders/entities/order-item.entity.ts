@@ -8,6 +8,9 @@ export class OrderItem{
     @PrimaryGeneratedColumn('uuid',{name:'order_item_id'})
     id:string;
 
+    @Column('varchar',{name:'product_name'})
+    productName:string;
+
     @Column({name:'quantity'})
     quantity:number;
 
