@@ -29,6 +29,7 @@ export class OrdersController {
   @ApiResponse({status:HttpStatus.UNAUTHORIZED, description:'Unauthoriced'})
   @ApiResponse({status:HttpStatus.NOT_FOUND,description:'Order not found'})
   @ApiResponse({status:HttpStatus.INTERNAL_SERVER_ERROR,description: 'Internal server error'})
+  @Auth()
   @Get(':id')
   async getOrderDetail(@Param('id') id:string, @GetUser() user:User):Promise<GetOrderDetailDto>{
     return this.ordersService.getOrderDetail(user, id);
