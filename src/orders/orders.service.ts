@@ -54,7 +54,7 @@ export class OrdersService {
     }
 
 
-    async GetOrderDetail(user:User, orderId:string):Promise<GetOrderDetailDto>{
+    async getOrderDetail(user:User, orderId:string):Promise<GetOrderDetailDto>{
         try {
            const order = await this.ordersRepository
                     .createQueryBuilder('order')
