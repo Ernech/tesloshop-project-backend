@@ -14,6 +14,7 @@ import { MessagesWsModule } from './messages-ws/messages-ws.module';
 import { OrdersModule } from './orders/orders.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { StripeModule } from './stripe/stripe.module';
 
 @Module({
   imports: [
@@ -46,7 +47,7 @@ import { APP_GUARD } from '@nestjs/core';
     ServeStaticModule.forRoot({
       rootPath: join(__dirname,'..','public'), 
     }),
-
+    StripeModule.forRootAsync(),
     ProductsModule,
 
     CommonModule,
@@ -60,6 +61,8 @@ import { APP_GUARD } from '@nestjs/core';
     MessagesWsModule,
 
     OrdersModule,
+
+    StripeModule,
 
   ],
   providers:[
