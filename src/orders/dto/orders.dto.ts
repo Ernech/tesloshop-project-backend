@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { IsNotEmpty, IsNumber, IsString, IsUUID, Min } from "class-validator";
 import { Column } from "typeorm";
 
 export class GetOrderDTO{
@@ -42,3 +43,20 @@ export class GetOrderDetailDto extends GetOrderDTO{
     orderItems:OrderItemDto[]
 }
 
+export class CreateOrderItemDto{
+
+    @IsNotEmpty({message:"Product ID is required"})
+    @IsString({message:"Invalid Product ID"})
+    @IsUUID()
+    productId:string;
+
+    @IsNumber()
+    @Min(0,{message:"Quantity must be greater than 1"})
+    quantity:number;
+}
+
+export class CreateOrderDto{
+
+    items: CreateOrderDto[]
+
+}
