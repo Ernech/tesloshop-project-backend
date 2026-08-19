@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from './entities/order.entity';
 import { Repository } from 'typeorm';
@@ -6,11 +6,19 @@ import { User } from 'src/auth/entities/user.entity';
 import { GetOrderDetailDto, GetOrderDTO } from './dto/orders.dto';
 import { PaginatedResponseDTO } from 'src/common/dtos/pagination-reponse.dto';
 import { OrdersPaginationDto } from './dto/orders-pagination.dto';
+import { STRIPE_CLIENT } from 'src/stripe/stripe.module';
+import Stripe from 'stripe';
+import { Product } from 'src/products/entities';
 
 @Injectable()
 export class OrdersService {
 
-    constructor(@InjectRepository(Order) private readonly ordersRepository:Repository<Order>){}
+    constructor(
+        @InjectRepository(Order) private readonly ordersRepository:Repository<Order>,
+        @InjectRepository(Product) private readonly productRepository:Repository<Product>,
+        @Inject(STRIPE_CLIENT) private readonly stripe:Stripe
+        
+    ){}
 
 
     async getUserOrders(user:User, orderPaginationDto:OrdersPaginationDto):Promise<PaginatedResponseDTO<GetOrderDTO>>{

@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsNumber, IsString, IsUUID, Min } from "class-validator";
+import { IsArray, IsNotEmpty, IsNumber, IsString, IsUUID, Min } from "class-validator";
 import { Column } from "typeorm";
 
 export class GetOrderDTO{
@@ -57,6 +57,13 @@ export class CreateOrderItemDto{
 
 export class CreateOrderDto{
 
+    @IsNotEmpty({message:"Shipping address ID is required"})
+    @IsString({message:"Invalid Shipping Address ID"})
+    @IsUUID()
+    shippingAddressId:string;
+
+    @IsNotEmpty({message:"Order items are required"})
+    @IsArray()
     items: CreateOrderDto[]
 
 }
