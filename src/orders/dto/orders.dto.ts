@@ -1,6 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsArray, IsNotEmpty, IsNumber, IsString, IsUUID, Min } from "class-validator";
-import { Column } from "typeorm";
+
+import { CurrenciesEnum } from "../enums/currencies.enum";
 
 export class GetOrderDTO{
 
@@ -69,5 +70,21 @@ export class CreateOrderDto{
     @IsArray()
     @ApiProperty({name:"items",type:[CreateOrderItemDto]})
     items: CreateOrderItemDto[]
+
+}
+
+export class CreateOrderResponseDto{
+
+    @ApiProperty({name:"orderId",description:"ID of the new order created", example: "6b8dd217-39b0-4c06-ae77-e69f741ba8c5"})
+    orderId: string;
+    
+    @ApiProperty({name:"clientSecret", description:"Stripe generated Token"})
+    clientSecret: string;
+
+    @ApiProperty({name:"Total", description:"Order total amount", example:150.00})
+    total: number;
+
+    @ApiProperty({name:"currency", description:"Order currency", example: CurrenciesEnum.USD})
+    currency: CurrenciesEnum;
 
 }
