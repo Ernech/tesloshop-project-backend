@@ -2,6 +2,7 @@ import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, Pri
 import { OrderItem } from "./order-item.entity";
 import { User } from "src/auth/entities/user.entity";
 import { OrderStatus } from "../enums/order-status.enum";
+import { Transaction } from "./transaction.entity";
 
 @Entity('order')
 export class Order{
@@ -18,8 +19,6 @@ export class Order{
     @Column('text',{name:'shipping_address'}) 
     shippingAddress: string;
 
-    @Column('text', { nullable: true, name: 'stripe_charge_id' }) // ID de transacción de Stripe
-    stripeChargeId: string;
 
     @CreateDateColumn({ type: 'timestamp with time zone', name: 'created_at' })
     createdAt: Date;
@@ -33,5 +32,7 @@ export class Order{
     @OneToMany(() => OrderItem, (item) => item.order, { cascade: true })
     items: OrderItem[];
 
+    @OneToMany(()=>Transaction,(transaction)=>transaction.order)
+    transactions:Transaction[]
 
 }

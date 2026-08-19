@@ -1,5 +1,5 @@
 import { Product } from "src/products/entities";
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn,  } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn,  } from "typeorm";
 import { Order } from "./order.entity";
 
 @Entity('order_item')
@@ -14,13 +14,15 @@ export class OrderItem{
     @Column({name:'quantity'})
     quantity:number;
 
-    @Column('numeric', {name:'price', precision: 10, scale: 2 }) // 👈 Congela el precio histórico
+    @Column('numeric', {name:'price', precision: 10, scale: 2 }) 
     price: number;
 
     @ManyToOne(() => Order, (order) => order.items, { onDelete: 'CASCADE' })
+    @JoinColumn({name:'order_id',referencedColumnName:'id'})
     order: Order;
 
     @ManyToOne(() => Product, { onDelete: 'RESTRICT' }) 
+    @JoinColumn({name:'product_id',referencedColumnName:'id'})
     product: Product;
 
 }

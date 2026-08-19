@@ -48,10 +48,12 @@ export class CreateOrderItemDto{
     @IsNotEmpty({message:"Product ID is required"})
     @IsString({message:"Invalid Product ID"})
     @IsUUID()
+    @ApiProperty({name:"productId",example:"6b8dd217-39b0-4c06-ae77-e69f741ba8c5"})
     productId:string;
 
     @IsNumber()
     @Min(0,{message:"Quantity must be greater than 1"})
+    @ApiProperty({name:"quantity",example:2})
     quantity:number;
 }
 
@@ -60,10 +62,12 @@ export class CreateOrderDto{
     @IsNotEmpty({message:"Shipping address ID is required"})
     @IsString({message:"Invalid Shipping Address ID"})
     @IsUUID()
+    @ApiProperty({name:"shippingAddressId",example:"6b8dd217-39b0-4c06-ae77-e69f741ba8c5"})
     shippingAddressId:string;
 
     @IsNotEmpty({message:"Order items are required"})
     @IsArray()
-    items: CreateOrderDto[]
+    @ApiProperty({name:"items",type:[CreateOrderItemDto]})
+    items: CreateOrderItemDto[]
 
 }
