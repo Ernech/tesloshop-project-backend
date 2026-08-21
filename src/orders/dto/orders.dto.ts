@@ -3,6 +3,24 @@ import { IsArray, IsNotEmpty, IsNumber, IsString, IsUUID, Min } from "class-vali
 
 import { CurrenciesEnum } from "../enums/currencies.enum";
 
+
+class ShippingAddressDTO {
+    @ApiProperty({ example: "1234 Market St Apt 5B" })
+    streetAddress: string;
+
+    @ApiProperty({ example: "Philadelphia" })
+    city: string;
+
+    @ApiProperty({ example: "PA" })
+    state: string;
+
+    @ApiProperty({ example: "19104" })
+    postalCode: string;
+
+    @ApiProperty({ example: "United States" })
+    country: string;
+}
+
 export class GetOrderDTO{
 
     @ApiProperty({description:"Order Id", example:"6e3ae4f7-ff71-4ebf-8bda-a280b70142e6"})
@@ -14,8 +32,8 @@ export class GetOrderDTO{
     @ApiProperty({description:"Order current status",example:"PAID"})
     status:string
 
-    @ApiProperty({description:"Order shipping address", example:"John Smith 1234 Market StApt 5B Philadelphia, PA 19104"})
-    shippingAddress:string
+    @ApiProperty({description:"Order shipping address", example:"John Smith 1234 Market StApt 5B Philadelphia, PA 19104",type:ShippingAddressDTO})
+    shippingAddress:ShippingAddressDTO
 
     @ApiProperty({description:"Order creation date", example:"2026-08-07T22:18:00.000Z"})
     orderCreationDate:Date;

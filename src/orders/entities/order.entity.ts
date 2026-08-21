@@ -16,8 +16,14 @@ export class Order{
     @Column({type:"enum",enum:OrderStatus, default: OrderStatus.PENDING }) 
     status: OrderStatus;
 
-    @Column('text',{name:'shipping_address'}) 
-    shippingAddress: string;
+    @Column('jsonb', { name: 'shipping_address' })
+    shippingAddress: {
+        streetAddress: string;
+        city: string;
+        state: string;
+        postalCode: string;
+        country: string;
+    };
 
 
     @CreateDateColumn({ type: 'timestamp with time zone', name: 'created_at' })

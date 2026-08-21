@@ -25,6 +25,9 @@ export class AddressEntity{
     @Column('boolean',{name:'is_default',default:false})
     isDefault:boolean;
 
+    @Column('boolean',{name:'is_active',default:true})
+    isActive:boolean;
+
     @ManyToOne(()=>User,(user)=>user.addresses, { onDelete:'CASCADE' })
     @JoinColumn({name:'user_id',referencedColumnName:'id'})
     user:User;
