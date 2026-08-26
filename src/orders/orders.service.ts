@@ -81,7 +81,7 @@ export class OrdersService {
             });
             await this.ordersRepository.save(newOrder);
             //Create a stripe payment intent
-            const paymentIntet = await this.stripe.paymentIntents.create({
+            const paymentIntent = await this.stripe.paymentIntents.create({
                 amount:totalAmountInCents,
                 currency:CurrenciesEnum.USD,
                 payment_method_types:['card'],
@@ -92,22 +92,22 @@ export class OrdersService {
             });
             //Update order with stripe transaction
             const newTransaction = this.transactionRepository.create({
-                stripePaymentIntentId:paymentIntet.id,
-                amount:totalAmountInCents,
-                cardBrand:"VISA", //TODO: get the card brand
-                status:paymentIntet.status,
-                cardLast4:"1111", //TODO: Get the cars last four digits
-                cardCountry:"US",
-                receiptUrl:"http://www.stripereceipt.com/dw1234fewfejweij23"
+                stripePaymentIntentId:paymentIntent.id,
+                amount: paymentIntent.amount,
+                currency: paymentIntent.currency,
+                status: paymentIntent.status,
+                customerId: typeof paymentIntent.customer === 'string' ? paymentIntent.customer : null,
+                paymentMethodId: typeof paymentIntent.payment_method === 'string' ? paymentIntent.payment_method : null,
+                latestChargeId: typeof paymentIntent.latest_charge === 'string' ? paymentIntent.latest_charge : null,
+                metadata: paymentIntent.metadata || {},
 
             });
             newOrder.transactions.push(newTransaction);
             await this.ordersRepository.save(newOrder);
             return {
                 orderId:newOrder.id,
-                clientSecret:paymentIntet.client_secret,
-                currency:CurrenciesEnum.USD,
-                total:totalAmountInCents/100
+                clientSecret:paymentIntent.client_secret,
+                paymentIntentId:paymentIntent.id
             }
         } catch (error) {
             this.handleDBErrors(error);
