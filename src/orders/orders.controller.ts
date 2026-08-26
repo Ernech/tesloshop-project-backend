@@ -1,11 +1,11 @@
-import { Controller, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Query } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post, Query } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { Auth, GetUser } from 'src/auth/decorators';
 import { User } from 'src/auth/entities/user.entity';
 import { OrdersPaginationDto } from './dto/orders-pagination.dto';
 import {  ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ApiPaginatedResponse, PaginatedResponseDTO } from 'src/common/dtos/pagination-reponse.dto';
-import { GetOrderDetailDto, GetOrderDTO } from './dto/orders.dto';
+import { CreateOrderDto, CreateOrderResponseDto, GetOrderDetailDto, GetOrderDTO } from './dto/orders.dto';
 
 @Controller('orders')
 export class OrdersController {
@@ -33,5 +33,18 @@ export class OrdersController {
   @Get(':id')
   async getOrderDetail(@Param('id') id:string, @GetUser() user:User):Promise<GetOrderDetailDto>{
     return this.ordersService.getOrderDetail(user, id);
+  }
+
+  @ApiOperation({summary:'Create New Order', description:'Creates a new order with PENDING status and the stripe payment intent'})
+  @HttpCode(HttpStatus.CREATED)
+  @ApiResponse({status:HttpStatus.CREATED, type:CreateOrderResponseDto})
+  @ApiResponse({status:HttpStatus.UNAUTHORIZED, description:'Unauthoriced'})
+  @ApiResponse({status:HttpStatus.BAD_REQUEST, description:'Bad Request'})
+  @ApiResponse({status:HttpStatus.NOT_FOUND,description:'Not Found'})
+  @ApiResponse({status:HttpStatus.INTERNAL_SERVER_ERROR,description: 'Internal server error'})
+  @Auth()
+  @Post('/new')
+  async createOrderAndPaymentIntent(@Body() createOrderDto:CreateOrderDto, @GetUser() user:User):Promise<CreateOrderResponseDto>{
+    return this.ordersService.createPayemntIntentAndOrder(user,createOrderDto);
   }
 }
