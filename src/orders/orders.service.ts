@@ -65,9 +65,21 @@ export class OrdersService {
                 });
                 orderItems.push(newOrderItem);
             }
+
+            //Validate order number existance
+            let orderNumberExists=true;
+            let newOrderNumber ='';
+            while(orderNumberExists){
+                let generatedOrderNumber = this.generateOrderNumber();
+                let order = await this.ordersRepository.findOne({where:{orderNumber:generatedOrderNumber}});
+                if(!order){
+                    orderNumberExists=false;
+                    newOrderNumber = generatedOrderNumber;
+                }
+            }
             //Create a new order with PENDING status 
-           
             const newOrder = this.ordersRepository.create({
+                orderNumber:newOrderNumber,
                 total: totalAmountInCents/100,
                 shippingAddress:{
                     streetAddress: shippingAddress.streetAddress,
@@ -122,6 +134,7 @@ export class OrdersService {
             .innerJoin('order.user', 'user')
             .select([
                 'order.id',
+                'order.orderNumber',
                 'order.total',
                 'order.status',
                 'order.shippingAddress',
@@ -163,6 +176,7 @@ export class OrdersService {
                     .innerJoinAndSelect('order.items', 'orderItem') 
                     .select([
                         'order.id',
+                        'order.orderNumber',
                         'order.total',
                         'order.status',
                         'order.shippingAddress',
@@ -206,6 +220,18 @@ export class OrdersService {
     
         throw new InternalServerErrorException('Please check server logs');
     
+      }
+
+      private generateOrderNumber():string{
+        const allowedCharacters ="ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+        const currentYear = new Date().getFullYear();
+        let randomCharacters = '';
+        for(let i=0; i<5 ; i++){
+            randomCharacters += allowedCharacters.charAt(Math.floor(Math.random() * allowedCharacters.length));
+            
+        }
+        return `ORD-${currentYear}-${randomCharacters}`
+
       }
 
 }
