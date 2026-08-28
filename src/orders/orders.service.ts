@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from './entities/order.entity';
 import { In, Repository } from 'typeorm';
 import { User } from 'src/auth/entities/user.entity';
-import { CreateOrderDto, CreateOrderResponseDto, GetOrderDetailDto, GetOrderDTO } from './dto/orders.dto';
+import { CreateOrderDto, CreateOrderResponseDto, GetOrderDetailDto, GetOrderDTO, CompleteOrderDto } from './dto/orders.dto';
 import { PaginatedResponseDTO } from 'src/common/dtos/pagination-reponse.dto';
 import { OrdersPaginationDto } from './dto/orders-pagination.dto';
 import { STRIPE_CLIENT } from 'src/stripe/stripe.module';
@@ -167,28 +167,20 @@ export class OrdersService {
 
     }
 
+    async completeAndProcessOrder(user:User,completeOrderDto:CompleteOrderDto){
+        try {
+            //Check if the order exists 
+
+        } catch (error) {
+            this.handleDBErrors(error)
+        }
+
+    }
+
     //TODO: Ajustar query builder para la dirección de envío
     async getOrderDetail(user:User, orderId:string):Promise<GetOrderDetailDto>{
         try {
-           const order = await this.ordersRepository
-                    .createQueryBuilder('order')
-                    .innerJoin('order.user', 'user')
-                    .innerJoinAndSelect('order.items', 'orderItem') 
-                    .select([
-                        'order.id',
-                        'order.orderNumber',
-                        'order.total',
-                        'order.status',
-                        'order.shippingAddress',
-                        'order.createdAt',
-                        'orderItem.productId',
-                        'orderItem.productName',
-                        'orderItem.quantity',
-                        'orderItem.price',
-                    ])
-                    .where('order.id = :orderId', { orderId })
-                    .andWhere('user.id = :userId', { userId: user.id })
-                    .getOne();
+           const order = await this.getOrder(orderId,user.id);
             if(!order){
                 throw new NotFoundException('Order not found');
             }
@@ -210,6 +202,28 @@ export class OrdersService {
         }
     }
 
+    private async getOrder(orderId:string,userId:string):Promise<Order>{
+        const order = await this.ordersRepository
+                    .createQueryBuilder('order')
+                    .innerJoin('order.user', 'user')
+                    .innerJoinAndSelect('order.items', 'orderItem') 
+                    .select([
+                        'order.id',
+                        'order.orderNumber',
+                        'order.total',
+                        'order.status',
+                        'order.shippingAddress',
+                        'order.createdAt',
+                        'orderItem.productId',
+                        'orderItem.productName',
+                        'orderItem.quantity',
+                        'orderItem.price',
+                    ])
+                    .where('order.id = :orderId', { orderId })
+                    .andWhere('user.id = :userId', { userId })
+                    .getOne();
+                    return order;
+    }
      private handleDBErrors( error: any ): never {
     
     

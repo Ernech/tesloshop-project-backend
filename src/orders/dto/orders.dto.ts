@@ -102,6 +102,21 @@ export class CreateOrderResponseDto{
     @ApiProperty({name:"clientSecret", description:"Stripe generated Token"})
     clientSecret: string;
 
-   
+}
+
+export class CompleteOrderDto{
+    @IsString({message:'Order ID is required'})
+    @IsNotEmpty({message:'Order ID is required'})
+    @IsUUID()
+    orderId:string;
+
+    @IsString({message:'Stripe payment intent id is required'})
+    @IsNotEmpty({message:'Stripe payment intent id is required'})
+    paymentIntentId:string;
+
+    @IsNotEmpty({message:"Order items are required"})
+    @IsArray()
+    @ApiProperty({name:"items",type:[CreateOrderItemDto]})
+    items: CreateOrderItemDto[]
 
 }
