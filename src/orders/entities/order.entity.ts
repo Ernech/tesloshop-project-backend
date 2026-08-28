@@ -10,6 +10,9 @@ export class Order{
     @PrimaryGeneratedColumn('uuid',{name:'order_id'})
     id:string;
 
+    @Column('varchar',{name:'order_number',length:50,unique:true})
+    orderNumber:string;
+
     @Column('numeric', { name:'total', precision: 10, scale: 2 })
     total: number;
 
