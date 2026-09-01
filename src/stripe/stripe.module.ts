@@ -1,15 +1,20 @@
 import { DynamicModule, Global, Module } from '@nestjs/common';
 import {  ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
+import { StripeController } from './stripe.controller';
+import { OrdersModule } from 'src/orders/orders.module';
 
 export const STRIPE_CLIENT = 'STRIPE_CLIENT';
 @Global()
-@Module({})
+@Module({
+  controllers: [StripeController]
+})
 export class StripeModule {
     static forRootAsync():DynamicModule {
 
        return {
       module: StripeModule,
+       imports: [OrdersModule],
       providers: [
         {
           provide: STRIPE_CLIENT,

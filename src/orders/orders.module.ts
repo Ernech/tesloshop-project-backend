@@ -10,6 +10,7 @@ import { Transaction } from './entities/transaction.entity';
 @Module({
   controllers: [OrdersController],
   providers: [OrdersService],
-  imports:[TypeOrmModule.forFeature([Order,OrderItem,AddressEntity, Transaction])]
+  imports:[TypeOrmModule.forFeature([Order,OrderItem,AddressEntity, Transaction])],
+  exports:[OrdersService]
 })
 export class OrdersModule {}

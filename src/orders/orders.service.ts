@@ -1,7 +1,7 @@
 import { BadRequestException, Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from './entities/order.entity';
-import { In, Repository } from 'typeorm';
+import { DataSource, In, Repository } from 'typeorm';
 import { User } from 'src/auth/entities/user.entity';
 import { CreateOrderDto, CreateOrderResponseDto, GetOrderDetailDto, GetOrderDTO, CompleteOrderDto } from './dto/orders.dto';
 import { PaginatedResponseDTO } from 'src/common/dtos/pagination-reponse.dto';
@@ -13,6 +13,7 @@ import { AddressEntity } from './entities/address.entity';
 import { OrderItem } from './entities/order-item.entity';
 import { CurrenciesEnum } from './enums/currencies.enum';
 import { Transaction } from './entities/transaction.entity';
+import { OrderStatus } from './enums/order-status.enum';
 
 @Injectable()
 export class OrdersService {
@@ -23,6 +24,7 @@ export class OrdersService {
         @InjectRepository(Product) private readonly productRepository:Repository<Product>,
         @InjectRepository(AddressEntity) private readonly addressRepository:Repository<AddressEntity>,
         @InjectRepository(Transaction) private readonly transactionRepository:Repository<Transaction>,
+        private dataSource: DataSource,
         @Inject(STRIPE_CLIENT) private readonly stripe:Stripe
     ){}
 
@@ -167,12 +169,63 @@ export class OrdersService {
 
     }
 
-    async completeAndProcessOrder(user:User,completeOrderDto:CompleteOrderDto){
+    async fulfillOrder(paymentIntentId:string){
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
         try {
             //Check if the order exists 
+             const order = await queryRunner.manager.createQueryBuilder(Order,'order')
+             .innerJoinAndSelect('order.items','orderItem')
+             .innerJoin('order.transactions','transaction')
+             .select([
+                        'order.id',
+                        'order.orderNumber',
+                        'order.total',
+                        'order.status',
+                        'order.shippingAddress',
+                        'order.createdAt'
+            ])
+            .where('transaction.stripePaymentIntentId=:paymentIntentId',{paymentIntentId})
+            .getOne();
+             if(!order){
+                throw new NotFoundException(`The order "${order.id}" does not exists`)
+             }
+             if(order.status==OrderStatus.PAID){
+                //Prevent to process a payment twice
+                await queryRunner.rollbackTransaction();
+                return;
+             }
+             //Check the orderItems
+             const items:OrderItem[] = order.items;
+             //Validate stock
+             for(const item of items){
+                const dbProduct = await queryRunner.manager.findOne(Product,{
+                    where:{ id:item.id },
+                    lock:{mode:'pessimistic_write'}
+                })
+                if(!dbProduct){
+                    throw new NotFoundException(`The product ${item.productName} does not exists.`);
+                }
+                if(dbProduct.stock<item.quantity){
+                    throw new NotFoundException(`Insuficient stock for the product ${dbProduct.description}. Available ${dbProduct.stock}`)
+                }
+                //Discount stock
+                dbProduct.stock-=item.quantity;
+                await queryRunner.manager.save(Product,dbProduct);
+                //Update order status
+            }
+            order.status=OrderStatus.PAID;
+            await queryRunner.manager.save(Order,order)
+            await queryRunner.commitTransaction();
 
         } catch (error) {
-            this.handleDBErrors(error)
+             console.error('Error proccesing order, rolling back changes...', error);
+            await queryRunner.rollbackTransaction();
+            this.handleDBErrors(error);
+        }
+        finally{
+            await queryRunner.release();
         }
 
     }
