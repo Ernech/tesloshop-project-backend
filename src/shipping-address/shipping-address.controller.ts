@@ -2,14 +2,16 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { ShippingAddressService } from './shipping-address.service';
 import { CreateShippingAddressDto } from './dto/create-shipping-address.dto';
 import { UpdateShippingAddressDto } from './dto/update-shipping-address.dto';
+import { User } from 'src/auth/entities/user.entity';
+import { GetUser } from 'src/auth/decorators';
 
 @Controller('shipping-address')
 export class ShippingAddressController {
   constructor(private readonly shippingAddressService: ShippingAddressService) {}
 
   @Post()
-  create(@Body() createShippingAddressDto: CreateShippingAddressDto) {
-    return this.shippingAddressService.create(createShippingAddressDto);
+  create(@Body() createShippingAddressDto: CreateShippingAddressDto,@GetUser() user:User,) {
+    return this.shippingAddressService.createNewShippingAddress(user,createShippingAddressDto);
   }
 
   @Get()
