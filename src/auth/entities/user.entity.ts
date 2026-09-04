@@ -2,7 +2,7 @@ import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany, PrimaryGenerated
 import { Product } from '../../products/entities';
 import { RefreshToken } from './refresh_tokens.entity';
 import { Order } from 'src/orders/entities/order.entity';
-import { AddressEntity } from 'src/orders/entities/address.entity';
+import { AddressEntity } from 'src/shipping-address/entities/address.entity';
 
 
 @Entity('users')

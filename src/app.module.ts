@@ -15,6 +15,7 @@ import { OrdersModule } from './orders/orders.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { StripeModule } from './stripe/stripe.module';
+import { ShippingAddressModule } from './shipping-address/shipping-address.module';
 
 @Module({
   imports: [
@@ -63,6 +64,8 @@ import { StripeModule } from './stripe/stripe.module';
     OrdersModule,
 
     StripeModule,
+
+    ShippingAddressModule,
 
   ],
   providers:[

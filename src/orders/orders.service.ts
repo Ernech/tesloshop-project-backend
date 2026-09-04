@@ -9,7 +9,7 @@ import { OrdersPaginationDto } from './dto/orders-pagination.dto';
 import { STRIPE_CLIENT } from 'src/stripe/stripe.module';
 import Stripe from 'stripe';
 import { Product } from 'src/products/entities';
-import { AddressEntity } from './entities/address.entity';
+import { AddressEntity } from '../shipping-address/entities/address.entity';
 import { OrderItem } from './entities/order-item.entity';
 import { CurrenciesEnum } from './enums/currencies.enum';
 import { Transaction } from './entities/transaction.entity';
