@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
-import { CreateShippingAddressDto, CreateShippingAddressResponseDto } from './dto/create-shipping-address.dto';
+import { CreateShippingAddressDto, CreateShippingAddressResponseDto, GetShippingAddressesResponseDTO } from './dto/create-shipping-address.dto';
 import { UpdateShippingAddressDto } from './dto/update-shipping-address.dto';
 import { Repository } from 'typeorm';
 import { AddressEntity } from './entities/address.entity';
@@ -59,8 +59,33 @@ export class ShippingAddressService {
     };
   }
 
-  findAll() {
-    return `This action returns all shippingAddress`;
+ async findAllUSerShippingAddress(user:User):Promise<GetShippingAddressesResponseDTO> {
+    try {
+      const [shippingAddresses,count] = await this.addressRepository.findAndCount({
+        where: {
+          isActive:true,
+          user:{id:user.id}
+        },
+        order:{isDefault:'DESC', createdAt:'DESC'}
+      });
+
+      return {
+        totalShippingAddress:count,
+        shippingAddresses:shippingAddresses.map(shippingAddress=>({
+          id:shippingAddress.id,
+          streetAddress:shippingAddress.streetAddress,
+          city:shippingAddress.city,
+          country:shippingAddress.country,
+          postalCode:shippingAddress.postalCode,
+          state:shippingAddress.state,
+          isDefault:shippingAddress.isDefault
+        }))
+      }
+
+      
+    } catch (error) {
+      this.handleDBErrors(error);
+    }
   }
 
   findOne(id: number) {

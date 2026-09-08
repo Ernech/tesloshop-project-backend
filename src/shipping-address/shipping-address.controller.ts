@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { ShippingAddressService } from './shipping-address.service';
-import { CreateShippingAddressDto } from './dto/create-shipping-address.dto';
+import { CreateShippingAddressDto, CreateShippingAddressResponseDto, GetShippingAddressesResponseDTO } from './dto/create-shipping-address.dto';
 import { UpdateShippingAddressDto } from './dto/update-shipping-address.dto';
 import { User } from 'src/auth/entities/user.entity';
 import { GetUser } from 'src/auth/decorators';
@@ -10,13 +10,13 @@ export class ShippingAddressController {
   constructor(private readonly shippingAddressService: ShippingAddressService) {}
 
   @Post()
-  create(@Body() createShippingAddressDto: CreateShippingAddressDto,@GetUser() user:User,) {
-    return this.shippingAddressService.createNewShippingAddress(user,createShippingAddressDto);
+  async createNewShippingAddress(@Body() createShippingAddressDto: CreateShippingAddressDto,@GetUser() user:User):Promise<CreateShippingAddressResponseDto> {
+    return await this.shippingAddressService.createNewShippingAddress(user,createShippingAddressDto);
   }
 
   @Get()
-  findAll() {
-    return this.shippingAddressService.findAll();
+  async findAllAhippingAddress(@GetUser() user:User):Promise<GetShippingAddressesResponseDTO>{
+    return await this.shippingAddressService.findAllUSerShippingAddress(user);
   }
 
   @Get(':id')
