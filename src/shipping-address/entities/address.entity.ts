@@ -32,6 +32,6 @@ export class AddressEntity{
     @JoinColumn({name:'user_id',referencedColumnName:'id'})
     user:User;
 
-    @CreateDateColumn({ type: 'timestamp with time zone', name: 'created_at' })
+    @CreateDateColumn({ type: 'timestamp with time zone',default:'CURRENT_TIMESTAMP', name: 'created_at' })
     createdAt: Date;
 }

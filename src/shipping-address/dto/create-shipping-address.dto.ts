@@ -63,3 +63,13 @@ export class CreateShippingAddressResponseDto{
     shippingAddress:ShippingAddressDto;
 
 }
+
+export class GetShippingAddressesResponseDTO{
+  
+    @ApiProperty({name:'Total Shipping addresses', example:5})
+    totalShippingAddress:number
+
+    @ApiProperty({name:'Shipping Addresses',type:[ShippingAddressDto]})
+    shippingAddresses:ShippingAddressDto[]
+
+}

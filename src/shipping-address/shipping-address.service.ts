@@ -13,10 +13,16 @@ export class ShippingAddressService {
 
   async createNewShippingAddress(user:User,createShippingAddressDto: CreateShippingAddressDto):Promise<CreateShippingAddressResponseDto> {
     try {
+      //Check if user overpass the max limit shipping addresses
+      const MAX_SHIPPING_ADDRESS=10;
+      const adressCount = await this.addressRepository.count({where:{isActive:true,user:{id:user.id}}});
+      if(adressCount>=MAX_SHIPPING_ADDRESS){
+        throw new BadRequestException(`You have reached the maximun shipping addresses (${MAX_SHIPPING_ADDRESS})`)
+      }
       //Check if there is a shipping address already set as default
       let isNewAddressDefault = false;
-      const adressCount = await this.addressRepository.count({where:{isActive:true, isDefault:true,user:{id:user.id}}})
-      if(adressCount<1){
+      const defaultAddressCount = await this.addressRepository.count({where:{isActive:true, isDefault:true,user:{id:user.id}}})
+      if(defaultAddressCount<1){
         //There's no address sert as default
         isNewAddressDefault = true;
       }
