@@ -1,6 +1,6 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe } from '@nestjs/common';
 import { ShippingAddressService } from './shipping-address.service';
-import { CreateShippingAddressDto, CreateShippingAddressResponseDto, GetShippingAddressesResponseDTO } from './dto/create-shipping-address.dto';
+import { CreateShippingAddressDto, CreateShippingAddressResponseDto, GetShippingAddressesResponseDTO, ShippingAddressDto } from './dto/create-shipping-address.dto';
 import { UpdateShippingAddressDto } from './dto/update-shipping-address.dto';
 import { User } from 'src/auth/entities/user.entity';
 import { GetUser } from 'src/auth/decorators';
@@ -15,13 +15,13 @@ export class ShippingAddressController {
   }
 
   @Get()
-  async findAllAhippingAddress(@GetUser() user:User):Promise<GetShippingAddressesResponseDTO>{
+  async findAllShippingAddress(@GetUser() user:User):Promise<GetShippingAddressesResponseDTO>{
     return await this.shippingAddressService.findAllUSerShippingAddress(user);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.shippingAddressService.findOne(+id);
+  async findOne(@Param('id',ParseUUIDPipe) id: string, @GetUser() user:User):Promise<ShippingAddressDto> {
+    return await this.shippingAddressService.findShippingAddressById(user,id);
   }
 
   @Patch(':id')
@@ -29,8 +29,13 @@ export class ShippingAddressController {
     return this.shippingAddressService.update(+id, updateShippingAddressDto);
   }
 
+  @Patch(':id/set-default')
+  async changeDefaultShippingAddress(@Param('id',ParseUUIDPipe) id:string, @GetUser() user:User){
+    return await this.changeDefaultShippingAddress(id,user)
+  }
+
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.shippingAddressService.remove(+id);
+  async removeShippingAddress(@Param('id',ParseUUIDPipe) id: string, @GetUser() user:User) {
+    return this.shippingAddressService.deleteShippingAddress(id,user);
   }
 }

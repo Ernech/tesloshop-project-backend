@@ -1,7 +1,7 @@
-import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
-import { CreateShippingAddressDto, CreateShippingAddressResponseDto, GetShippingAddressesResponseDTO } from './dto/create-shipping-address.dto';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { CreateShippingAddressDto, CreateShippingAddressResponseDto, GetShippingAddressesResponseDTO, ShippingAddressDto } from './dto/create-shipping-address.dto';
 import { UpdateShippingAddressDto } from './dto/update-shipping-address.dto';
-import { Repository } from 'typeorm';
+import { Repository, DataSource } from 'typeorm';
 import { AddressEntity } from './entities/address.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/auth/entities/user.entity';
@@ -9,7 +9,7 @@ import { User } from 'src/auth/entities/user.entity';
 @Injectable()
 export class ShippingAddressService {
 
-  constructor(@InjectRepository(AddressEntity) private readonly addressRepository:Repository<AddressEntity>,){}
+  constructor(@InjectRepository(AddressEntity) private readonly addressRepository:Repository<AddressEntity>,private datasource:DataSource){}
 
   async createNewShippingAddress(user:User,createShippingAddressDto: CreateShippingAddressDto):Promise<CreateShippingAddressResponseDto> {
     try {
@@ -88,16 +88,105 @@ export class ShippingAddressService {
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} shippingAddress`;
+ async findShippingAddressById(user:User,id: string):Promise<ShippingAddressDto> {
+    try {
+      const shppingAddress = await this.addressRepository.findOneBy({id,isActive:true,user:{id:user.id}});
+      if(!shppingAddress){
+        throw new NotFoundException("Shipping address not found.");
+      }
+      return{
+        id:shppingAddress.id,
+        city:shppingAddress.city,
+        country:shppingAddress.country,
+        state:shppingAddress.state,
+        streetAddress:shppingAddress.streetAddress,
+        postalCode:shppingAddress.postalCode,
+        isDefault:shppingAddress.isDefault
+      }
+    } catch (error) {
+      this.handleDBErrors(error);
+    }
+  }
+
+  async changeDefualtShippingAddress(id:string, user:User):Promise<{message:string}>{
+    return await this.datasource.transaction(async(manager)=>{
+      //Check if the new default shipping address exists
+      const newDefaultShippingAddress = await manager.findOne(AddressEntity,
+        {
+          where: 
+          {
+            id,
+            isActive:true,
+            user:{id:user.id}
+          }
+        });
+
+      if(!newDefaultShippingAddress){
+        throw new NotFoundException("The shipping address does not exists")
+      }
+      //Check if the shipping address is already set as default
+      if(newDefaultShippingAddress.isDefault){
+        throw new BadRequestException("The shipping address is already set as default");
+      } 
+      //Find the old default shipping address
+      const oldDefaultSHippingAddress = await manager.findOne(AddressEntity, {
+        where:{
+          isDefault:true,isActive:true, user:{
+            id:user.id
+          }
+        }
+      }) 
+      if(oldDefaultSHippingAddress){
+        oldDefaultSHippingAddress.isDefault=false;
+        await manager.save(AddressEntity,oldDefaultSHippingAddress);
+      }
+      //Set the new default shipping address
+      newDefaultShippingAddress.isDefault=false;
+      await manager.save(AddressEntity,newDefaultShippingAddress);
+      return {message:"The new defaul shipping address has been successfully set"};
+    });
   }
 
   update(id: number, updateShippingAddressDto: UpdateShippingAddressDto) {
     return `This action updates a #${id} shippingAddress`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} shippingAddress`;
+  async deleteShippingAddress(id: string, user:User):Promise<{message:string}> {
+
+  return await this.datasource.transaction(async (manager)=>{
+    const addressToDelete = await manager.findOne(AddressEntity,{
+      where:
+        {id,
+          isActive:true,
+          user:
+          {
+            id:user.id
+          }
+        }
+      });
+      if(!addressToDelete){
+        throw new NotFoundException("The shipping address was not found");
+      }
+      const wasDefault = addressToDelete.isDefault;
+      addressToDelete.isActive=false;
+      addressToDelete.isDefault = false;
+      await manager.save(AddressEntity,addressToDelete);
+      if(wasDefault){
+        //Find the newest shipping address and set it as default
+        const newDefaultShippingAddress = await manager.findOne(AddressEntity,{
+          where:{isActive:true},
+          order:{
+            createdAt:'DESC'
+          }
+        });
+        if(newDefaultShippingAddress){
+          newDefaultShippingAddress.isDefault=true;
+          await manager.save(AddressEntity,newDefaultShippingAddress);
+        }
+      }
+      return {message:"The shipping address was succesfully deleted"};
+    });
+    
   }
 
    private handleDBErrors( error: any ): never {
