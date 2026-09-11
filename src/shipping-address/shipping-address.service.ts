@@ -147,7 +147,7 @@ export class ShippingAddressService {
     });
   }
 
-  async updateShippingAddress(user:User, id: string,updateShippingAddressDto: UpdateShippingAddressDto):Promise<{message:string, updatedShippingAddress:ShippingAddressDto}> {
+  async updateShippingAddress(id: string,user:User, updateShippingAddressDto: UpdateShippingAddressDto):Promise<{message:string, updatedShippingAddress:ShippingAddressDto}> {
     try {
       const shppingAddress = await this.addressRepository.findOneBy({id,isActive:true,user:{id:user.id}});
       if(!shppingAddress){

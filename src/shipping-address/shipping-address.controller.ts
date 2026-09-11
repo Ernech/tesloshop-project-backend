@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe, Put } from '@nestjs/common';
 import { ShippingAddressService } from './shipping-address.service';
 import { CreateShippingAddressDto, CreateShippingAddressResponseDto, GetShippingAddressesResponseDTO, ShippingAddressDto } from './dto/create-shipping-address.dto';
 import { UpdateShippingAddressDto } from './dto/update-shipping-address.dto';
@@ -24,9 +24,9 @@ export class ShippingAddressController {
     return await this.shippingAddressService.findShippingAddressById(user,id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateShippingAddressDto: UpdateShippingAddressDto) {
-    return this.shippingAddressService.update(+id, updateShippingAddressDto);
+  @Put(':id')
+  updateShippingAddress(@Param('id') id: string, @GetUser() user:User,@Body() updateShippingAddressDto: UpdateShippingAddressDto) {
+    return this.shippingAddressService.updateShippingAddress(id, user,updateShippingAddressDto);
   }
 
   @Patch(':id/set-default')
