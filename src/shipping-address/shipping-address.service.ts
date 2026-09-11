@@ -147,8 +147,22 @@ export class ShippingAddressService {
     });
   }
 
-  update(id: number, updateShippingAddressDto: UpdateShippingAddressDto) {
-    return `This action updates a #${id} shippingAddress`;
+  async updateShippingAddress(user:User, id: string,updateShippingAddressDto: UpdateShippingAddressDto):Promise<{message:string, updatedShippingAddress:ShippingAddressDto}> {
+    try {
+      const shppingAddress = await this.addressRepository.findOneBy({id,isActive:true,user:{id:user.id}});
+      if(!shppingAddress){
+        throw new NotFoundException("Shipping address not found.");
+      }
+      const updatedShippingAddress=this.addressRepository.merge(shppingAddress,updateShippingAddressDto);
+      await this.addressRepository.save(updateShippingAddressDto);
+      return{
+        message:"Shipping address updated",
+        updatedShippingAddress
+      }
+
+    } catch (error) {
+      this.handleDBErrors(error)
+    }
   }
 
   async deleteShippingAddress(id: string, user:User):Promise<{message:string}> {
