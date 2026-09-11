@@ -1,10 +1,11 @@
 import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateShippingAddressDto, CreateShippingAddressResponseDto, GetShippingAddressesResponseDTO, ShippingAddressDto } from './dto/create-shipping-address.dto';
-import { UpdateShippingAddressDto } from './dto/update-shipping-address.dto';
+import { UpdateShippingAddressDto, UpdatedShippingAddressResponseDto } from './dto/update-shipping-address.dto';
 import { Repository, DataSource } from 'typeorm';
 import { AddressEntity } from './entities/address.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/auth/entities/user.entity';
+import { ShippingAddressOperationDto } from './dto/shipping-address-operation.dto';
 
 @Injectable()
 export class ShippingAddressService {
@@ -108,7 +109,7 @@ export class ShippingAddressService {
     }
   }
 
-  async changeDefualtShippingAddress(id:string, user:User):Promise<{message:string}>{
+  async changeDefualtShippingAddress(id:string, user:User):Promise<ShippingAddressOperationDto>{
     return await this.datasource.transaction(async(manager)=>{
       //Check if the new default shipping address exists
       const newDefaultShippingAddress = await manager.findOne(AddressEntity,
@@ -147,7 +148,7 @@ export class ShippingAddressService {
     });
   }
 
-  async updateShippingAddress(id: string,user:User, updateShippingAddressDto: UpdateShippingAddressDto):Promise<{message:string, updatedShippingAddress:ShippingAddressDto}> {
+  async updateShippingAddress(id: string,user:User, updateShippingAddressDto: UpdateShippingAddressDto):Promise<UpdatedShippingAddressResponseDto> {
     try {
       const shppingAddress = await this.addressRepository.findOneBy({id,isActive:true,user:{id:user.id}});
       if(!shppingAddress){
@@ -157,7 +158,15 @@ export class ShippingAddressService {
       await this.addressRepository.save(updateShippingAddressDto);
       return{
         message:"Shipping address updated",
-        updatedShippingAddress
+        shippingAddress:{
+          id:updatedShippingAddress.id,
+          city:updatedShippingAddress.city,
+          country:updatedShippingAddress.country,
+          state:updatedShippingAddress.state,
+          postalCode:updatedShippingAddress.postalCode,
+          streetAddress:updatedShippingAddress.streetAddress,
+          isDefault:updatedShippingAddress.isDefault
+        }
       }
 
     } catch (error) {
@@ -165,7 +174,7 @@ export class ShippingAddressService {
     }
   }
 
-  async deleteShippingAddress(id: string, user:User):Promise<{message:string}> {
+  async deleteShippingAddress(id: string, user:User):Promise<ShippingAddressOperationDto> {
 
   return await this.datasource.transaction(async (manager)=>{
     const addressToDelete = await manager.findOne(AddressEntity,{
