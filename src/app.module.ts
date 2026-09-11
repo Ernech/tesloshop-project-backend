@@ -63,7 +63,6 @@ import { ShippingAddressModule } from './shipping-address/shipping-address.modul
 
     OrdersModule,
 
-    StripeModule,
 
     ShippingAddressModule,
 

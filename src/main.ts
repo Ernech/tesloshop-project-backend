@@ -26,6 +26,17 @@ async function bootstrap() {
     .setTitle('Teslo RESTFul API')
     .setDescription('Teslo shop endpoints')
     .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT', 
+        name: 'JWT',
+        description: 'Place your auth jwt',
+        in: 'header',
+      },
+      'secure-jwt', 
+    )
     .build();
   const document = SwaggerModule.createDocument(app, config,{extraModels: [PaginatedResponseDTO, GetOrderDTO]});
   SwaggerModule.setup('api', app, document);

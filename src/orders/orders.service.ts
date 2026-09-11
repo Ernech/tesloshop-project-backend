@@ -6,7 +6,6 @@ import { User } from 'src/auth/entities/user.entity';
 import { CreateOrderDto, CreateOrderResponseDto, GetOrderDetailDto, GetOrderDTO, CompleteOrderDto } from './dto/orders.dto';
 import { PaginatedResponseDTO } from 'src/common/dtos/pagination-reponse.dto';
 import { OrdersPaginationDto } from './dto/orders-pagination.dto';
-import { STRIPE_CLIENT } from 'src/stripe/stripe.module';
 import Stripe from 'stripe';
 import { Product } from 'src/products/entities';
 import { AddressEntity } from '../shipping-address/entities/address.entity';
@@ -14,6 +13,7 @@ import { OrderItem } from './entities/order-item.entity';
 import { CurrenciesEnum } from './enums/currencies.enum';
 import { Transaction } from './entities/transaction.entity';
 import { OrderStatus } from './enums/order-status.enum';
+import { STRIPE_CLIENT } from 'src/stripe/stripe.constants';
 
 @Injectable()
 export class OrdersService {
