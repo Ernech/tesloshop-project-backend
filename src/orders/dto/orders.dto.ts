@@ -71,7 +71,7 @@ export class CreateOrderItemDto{
     productId:string;
 
     @IsNumber()
-    @Min(0,{message:"Quantity must be greater than 1"})
+    @Min(1,{message:"Quantity must be greater than 1"})
     @ApiProperty({name:"quantity",example:2})
     quantity:number;
 }
