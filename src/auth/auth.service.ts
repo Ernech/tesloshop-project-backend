@@ -85,19 +85,19 @@ export class AuthService {
     const { password, email } = loginUserDto;
 
     const user = await this.userRepository.findOne({
-      where: { email },
-      select: { email: true, password: true, id: true, fullName: true, isActive: true, roles: true}
+      where: { email,isActive: true, },
+      select: { email: true, password: true, id: true, fullName: true, isActive: true, roles: true, loginAttempts:true,blockUntil:true,lastLoginAt:true,phoneNumber:true}
     });
-
+    if ( !user ){
+      throw new UnauthorizedException('Incorrect credentials');
+    } 
     //Check if account is currently blocked
     if(user.blockUntil && user.blockUntil> new Date()){
        const minutesLeft = Math.ceil((user.blockUntil.getTime() - new Date().getTime()) / 60000);
        throw new ForbiddenException(`Account temporarily locked. Try again in ${minutesLeft} minutes.`);
     }
       
-    if ( !user ){
-      throw new UnauthorizedException('Incorrect credentials');
-    } 
+   
      //If password is incorrect add a new login attempt 
     if ( !bcrypt.compareSync( password, user.password ) ){
       user.loginAttempts+=1;

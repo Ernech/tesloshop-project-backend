@@ -24,8 +24,6 @@ import { RefreshToken } from './entities/refresh_tokens.entity';
       imports: [ ConfigModule ],
       inject: [ ConfigService ],
       useFactory: ( configService: ConfigService ) => {
-        // console.log('JWT Secret', configService.get('JWT_SECRET') )
-        // console.log('JWT SECRET', process.env.JWT_SECRET)
         return {
           secret: configService.get('JWT_SECRET'),
           signOptions: {
@@ -34,12 +32,6 @@ import { RefreshToken } from './entities/refresh_tokens.entity';
         }
       }
     })
-    // JwtModule.register({
-      // secret: process.env.JWT_SECRET,
-      // signOptions: {
-      //   expiresIn:'2h'
-      // }
-    // })
 
   ],
   exports: [ TypeOrmModule, JwtStrategy, PassportModule, JwtModule ]
