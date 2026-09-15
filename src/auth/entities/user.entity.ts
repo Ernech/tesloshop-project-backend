@@ -1,5 +1,4 @@
 import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { Product } from '../../products/entities';
 import { RefreshToken } from './refresh_tokens.entity';
 import { Order } from 'src/orders/entities/order.entity';
 import { AddressEntity } from 'src/shipping-address/entities/address.entity';
