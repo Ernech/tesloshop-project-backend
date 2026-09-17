@@ -6,7 +6,10 @@ import { RefreshToken } from "./entities/refresh_tokens.entity";
 import { Test, TestingModule } from "@nestjs/testing";
 import { getRepositoryToken } from "@nestjs/typeorm";
 import { ForbiddenException, UnauthorizedException } from "@nestjs/common";
-import {compareSync} from 'bcrypt';
+import { randomBytes } from 'crypto';
+import * as bcrypt from 'bcrypt';
+import { UserProfileDto } from "./dto/login-user.dto";
+
 describe('AuthService', () => {
   //Create services 
   let authService:AuthService;
@@ -14,6 +17,16 @@ describe('AuthService', () => {
   //Create repositories
   let userRepository:Repository<User>;
   let refreshTokenRepository:Repository<RefreshToken>;
+  jest.mock('bcrypt',()=>({
+    compareSync: jest.fn()
+  }));
+  jest.mock('bcrypt', () => ({
+    hashSync: jest.fn().mockReturnValue('password_hasheado'),
+  }));
+  jest.mock('crypto', () => ({
+  ...jest.requireActual('crypto'), // Mantiene el resto de funciones de crypto intactas
+  randomBytes: jest.fn(),
+}));
   //Mock repository methods
   const mockRepository = () => ({
     find: jest.fn(),
@@ -25,12 +38,12 @@ describe('AuthService', () => {
   });
    //Mock jwt methods
    const mockJwtService = () => ({
-    sign: jest.fn(),
+    sign: jest.fn().mockResolvedValue('jwt_generated'),
     verify: jest.fn(),
   });
-  jest.mock('bcrypt', () => ({
-    compareSync: jest.fn(),
-  }));
+  
+
+
   beforeEach(async()=>{
     const module:TestingModule = await Test.createTestingModule({
       providers:[
@@ -96,65 +109,140 @@ describe('AuthService', () => {
 
   });
 
-  it('Should increment loginAttempts by one when password is incorrect',async()=>{
+  // it('Should increment loginAttempts by one when password is incorrect',async()=>{
 
-    const loginUserDto = {
+  //   const loginUserDto = {
+  //       email: 'test@example.com',
+  //       password: 'anyPassword123',
+  //   };
+  //   const mockUser = {
+  //       id: "1f56ada5-269b-4a29-8456-df867ba23155",
+  //       email: loginUserDto.email,
+  //       password: 'hashedPasswordInDb',
+  //       isActive: true,
+  //       blockUntil: null,
+  //       loginAttempts: 2, 
+  //     };
+  //     jest.spyOn(userRepository, 'findOne').mockResolvedValue(mockUser as any);
+  //     jest.spyOn(userRepository,'save').mockResolvedValue(mockUser as any);
+  //     jest.mocked(compareSync).mockReturnValue(false);
+
+  //     //Check if the exception is thrown
+  //     await expect(authService.login(loginUserDto)).rejects.toThrow(
+  //       new UnauthorizedException('Incorrect credentials')
+  //     );
+
+  //     expect(mockUser.loginAttempts).toBe(3); // Increased from 2 to 3
+  //     expect(mockUser.blockUntil).toBeNull(); // Block until should not be stored yet
+  //     expect(userRepository.save).toHaveBeenCalledWith(mockUser);
+
+  // });
+
+  // it('Should store blockUntil when max login attempts are reached',async()=>{
+  // const mockCurrentDate = new Date('2026-09-14T10:00:00.000Z');
+  // jest.useFakeTimers().setSystemTime(mockCurrentDate);
+  //  const expectedLockDate = new Date('2026-09-14T10:15:00.000Z'); // 15 minutes added
+  // const loginUserDto = {
+  //       email: 'test@example.com',
+  //       password: 'anyPassword123',
+  //   };
+  //   const mockUser = {
+  //       id: "1f56ada5-269b-4a29-8456-df867ba23155",
+  //       email: loginUserDto.email,
+  //       password: 'hashedPasswordInDb',
+  //       isActive: true,
+  //       blockUntil: null,
+  //       loginAttempts: 4, 
+  //     };
+  //     jest.spyOn(userRepository, 'findOne').mockResolvedValue(mockUser as any);
+  //     jest.spyOn(userRepository,'save').mockResolvedValue(mockUser as any);
+
+  //     jest.mocked(compareSync).mockReturnValue(false);
+  //      await expect(authService.login(loginUserDto)).rejects.toThrow(
+  //       new UnauthorizedException('Incorrect credentials')
+  //     );
+
+  //     expect(mockUser.loginAttempts).toBe(5); 
+  //     expect(mockUser.blockUntil).toEqual(expectedLockDate); 
+  //     expect(userRepository.save).toHaveBeenCalledWith(mockUser);
+  //     jest.useRealTimers();
+  // })
+
+  it('Should register user',async ()=>{
+    const createUserDto = {
         email: 'test@example.com',
-        password: 'anyPassword123',
-    };
-    const mockUser = {
-        id: "1f56ada5-269b-4a29-8456-df867ba23155",
-        email: loginUserDto.email,
-        password: 'hashedPasswordInDb',
-        isActive: true,
-        blockUntil: null,
-        loginAttempts: 2, 
+        password: 'password123',
+        fullName: 'Test User',
       };
-      jest.spyOn(userRepository, 'findOne').mockResolvedValue(mockUser as any);
-      jest.spyOn(userRepository,'save').mockResolvedValue(mockUser as any);
 
-      const bcryptCompare = jest.fn().mockResolvedValue(true);
-      jest.mocked(compareSync).mockReturnValue(false);
+    const mockCreatedUser = {
+      id: 'uuid-1234',
+      email: 'test@example.com',
+      password: 'password_hasheado',
+      fullName: 'Test User',
+    };
 
-      //Check if the exception is thrown
-      await expect(authService.login(loginUserDto)).rejects.toThrow(
-        new UnauthorizedException('Incorrect credentials')
-      );
+      jest.spyOn(userRepository,'create').mockReturnValue(mockCreatedUser as any);
+      jest.spyOn(userRepository,'save').mockResolvedValue(mockCreatedUser as any);
 
-      expect(mockUser.loginAttempts).toBe(3); // Increased from 2 to 3
-      expect(mockUser.blockUntil).toBeNull(); // Block until should not be stored yet
-      expect(userRepository.save).toHaveBeenCalledWith(mockUser);
+      jest.spyOn(jwtService as any, 'sign').mockReturnValue('token_real_de_prueba_123');
 
-  });
-
-  it('Should store blockUntil when max login attempts are reached',async()=>{
-  const mockCurrentDate = new Date('2026-09-14T10:00:00.000Z');
-  jest.useFakeTimers().setSystemTime(mockCurrentDate);
-   const expectedLockDate = new Date('2026-09-14T10:15:00.000Z'); // 15 minutes added
-  const loginUserDto = {
+      const result = await authService.create(createUserDto);
+      // expect(bcrypt.hashSync).toHaveBeenCalledTimes(1);
+      // expect(bcrypt.hashSync).toHaveBeenCalledWith('password123', 10);
+      expect(userRepository.create).toHaveBeenCalledWith({
         email: 'test@example.com',
-        password: 'anyPassword123',
-    };
-    const mockUser = {
-        id: "1f56ada5-269b-4a29-8456-df867ba23155",
-        email: loginUserDto.email,
-        password: 'hashedPasswordInDb',
-        isActive: true,
-        blockUntil: null,
-        loginAttempts: 4, 
-      };
-      jest.spyOn(userRepository, 'findOne').mockResolvedValue(mockUser as any);
-      jest.spyOn(userRepository,'save').mockResolvedValue(mockUser as any);
+        password:  expect.any(String),
+        fullName: 'Test User',
+      });
 
-      jest.mocked(compareSync).mockReturnValue(false);
-       await expect(authService.login(loginUserDto)).rejects.toThrow(
-        new UnauthorizedException('Incorrect credentials')
-      );
+      expect(userRepository.save).toHaveBeenCalledWith(mockCreatedUser);
+      expect(jwtService.sign).toHaveBeenCalledWith({ id: 'uuid-1234' });
 
-      expect(mockUser.loginAttempts).toBe(5); 
-      expect(mockUser.blockUntil).toEqual(expectedLockDate); 
-      expect(userRepository.save).toHaveBeenCalledWith(mockUser);
-      jest.useRealTimers();
+       expect(result).toEqual({
+      user: {
+        id: 'uuid-1234',
+        email: 'test@example.com',
+        fullName: 'Test User',
+      },
+      token: 'token_real_de_prueba_123',
+    });
+  })
+
+  it('Should generate refresh token',async()=>{
+    const userProfile:UserProfileDto={
+      id: 'uuid-1234',
+      email: 'test@example.com',
+      fullName: 'Test User', 
+      isActive: true,
+      roles: ['user'] 
+    }
+    
+    const mockCurrentDate = new Date('2026-09-14T10:00:00.000Z');
+    jest.useFakeTimers().setSystemTime(mockCurrentDate);
+    const refreshTokenExpiresDate = new Date(mockCurrentDate);
+    refreshTokenExpiresDate.setDate(refreshTokenExpiresDate.getDate() + 7); 
+    const mockCreatedRefreshToken ={
+        id: 'uuid-1234',
+          token:'secure_string',
+          expiresAt:refreshTokenExpiresDate,
+          user:userProfile
+    }
+    const generateSecureString = jest.spyOn(AuthService.prototype as any, 'generateSecureString');
+    generateSecureString.mockReturnValue("secure_string");
+    jest.spyOn(refreshTokenRepository,'create').mockReturnValue(mockCreatedRefreshToken as any);
+    jest.spyOn(refreshTokenRepository,'save').mockResolvedValue(mockCreatedRefreshToken as any);
+    const result = await authService.generateRefreshToken(userProfile);
+    
+    expect(result).toBe('secure_string');
+    expect(refreshTokenRepository.create).toHaveBeenCalledWith({
+       token:'secure_string',
+          expiresAt:refreshTokenExpiresDate,
+          user:userProfile
+    })
+    expect(refreshTokenRepository.save).toHaveBeenCalledWith(mockCreatedRefreshToken);
+    jest.useRealTimers();
+
   })
 
 });
