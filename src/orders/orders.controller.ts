@@ -6,6 +6,7 @@ import { OrdersPaginationDto } from './dto/orders-pagination.dto';
 import {  ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ApiPaginatedResponse, PaginatedResponseDTO } from 'src/common/dtos/pagination-reponse.dto';
 import { CreateOrderDto, CreateOrderResponseDto, GetOrderDetailDto, GetOrderDTO } from './dto/orders.dto';
+import { ValidRoles } from 'src/auth/interfaces';
 
 @Controller('orders')
 export class OrdersController {
@@ -15,7 +16,7 @@ export class OrdersController {
   @ApiPaginatedResponse(GetOrderDTO)
   @ApiResponse({status:400, description: 'Bad Request'})
   @ApiResponse({status:500, description:'Internal Server Error'})
-  @Auth()
+  @Auth(ValidRoles.user)
   @Get()
   async getUserOrders(  
     @GetUser() user:User,
@@ -29,7 +30,7 @@ export class OrdersController {
   @ApiResponse({status:HttpStatus.UNAUTHORIZED, description:'Unauthoriced'})
   @ApiResponse({status:HttpStatus.NOT_FOUND,description:'Order not found'})
   @ApiResponse({status:HttpStatus.INTERNAL_SERVER_ERROR,description: 'Internal server error'})
-  @Auth()
+  @Auth(ValidRoles.user)
   @Get(':id')
   async getOrderDetail(@Param('id') id:string, @GetUser() user:User):Promise<GetOrderDetailDto>{
     return this.ordersService.getOrderDetail(user, id);
@@ -42,7 +43,7 @@ export class OrdersController {
   @ApiResponse({status:HttpStatus.BAD_REQUEST, description:'Bad Request'})
   @ApiResponse({status:HttpStatus.NOT_FOUND,description:'Not Found'})
   @ApiResponse({status:HttpStatus.INTERNAL_SERVER_ERROR,description: 'Internal server error'})
-  @Auth()
+  @Auth(ValidRoles.user)
   @Post('/new')
   async createOrderAndPaymentIntent(@Body() createOrderDto:CreateOrderDto, @GetUser() user:User):Promise<CreateOrderResponseDto>{
     return this.ordersService.createPayemntIntentAndOrder(user,createOrderDto);
