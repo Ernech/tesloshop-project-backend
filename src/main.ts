@@ -27,16 +27,17 @@ async function bootstrap() {
     .setDescription('Teslo shop endpoints')
     .setVersion('1.0')
     .addBearerAuth(
-      {
-        type: 'http',
-        scheme: 'bearer',
-        bearerFormat: 'JWT', 
-        name: 'JWT',
-        description: 'Place your auth jwt',
-        in: 'header',
-      },
-      'secure-jwt', 
-    )
+    {
+      type: "http",
+      scheme: "bearer",
+      bearerFormat: "JWT",
+      in: "header",
+      name: "Authorization",
+      description: "Paste access token without Bearer prefix",
+    },
+    "Bearer"
+  )
+  .addSecurityRequirements("Bearer")
     .build();
   const document = SwaggerModule.createDocument(app, config,{extraModels: [PaginatedResponseDTO, GetOrderDTO]});
   SwaggerModule.setup('api', app, document);

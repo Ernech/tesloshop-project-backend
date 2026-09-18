@@ -142,7 +142,7 @@ export class ShippingAddressService {
         await manager.save(AddressEntity,oldDefaultSHippingAddress);
       }
       //Set the new default shipping address
-      newDefaultShippingAddress.isDefault=false;
+      newDefaultShippingAddress.isDefault=true;
       await manager.save(AddressEntity,newDefaultShippingAddress);
       return {message:"The new defaul shipping address has been successfully set"};
     });

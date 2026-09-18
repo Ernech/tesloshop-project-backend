@@ -5,71 +5,71 @@ export class CreateShippingAddressDto {
     
         @IsString({message:'Street address not valid'})
         @IsNotEmpty({message:'Street address is required'})
-        @ApiProperty({name:"Street Address"})
+        @ApiProperty({name:"streetAddress"})
         streetAddress:string;
     
         @IsString({message:'City not valid'})
         @IsNotEmpty({message:'City is required'})
-        @ApiProperty({name:"City"})
+        @ApiProperty({name:"city"})
         city:string;
     
         @IsString({message:'State not valid'})
         @IsNotEmpty({message:'State is required'})
-        @ApiProperty({name:'State'})
+        @ApiProperty({name:'state'})
         state:string;
     
         @IsString({message:'Postal code not valid'})
         @IsNotEmpty({message:'Postal code is required'})
-        @ApiProperty({name:'Postal Code'})
+        @ApiProperty({name:'postalCode'})
         postalCode:string;
     
         @IsString({message:'Country not valid'})
         @IsNotEmpty({message:'Country is required'})
-        @ApiProperty({name:'Country'})
+        @ApiProperty({name:'country'})
         country:string;
 
 }
 
 export class ShippingAddressDto{
         
-        @ApiProperty({name:"Shipping address id"})
+        @ApiProperty({name:"id"})
         id:string;
     
-        @ApiProperty({name:"Street Address"})
+        @ApiProperty({name:"streetAddress"})
         streetAddress:string;
     
-        @ApiProperty({name:"City"})
+        @ApiProperty({name:"city"})
         city:string;
     
-        @ApiProperty({name:'State'})
+        @ApiProperty({name:'state'})
         state:string;
     
-        @ApiProperty({name:'Postal Code'})
+        @ApiProperty({name:'postalCode'})
         postalCode:string;
     
-        @ApiProperty({name:'Country'})
+        @ApiProperty({name:'country'})
         country:string;
     
-        @ApiProperty({name:'Is Defaut'})
+        @ApiProperty({name:'isDefault'})
         isDefault:boolean;
 }
 
 export class CreateShippingAddressResponseDto{
     
-    @ApiProperty({name:'Message',example:"Shipping Address created"})
+    @ApiProperty({name:'message',example:"Shipping Address created"})
     message:string;
 
-    @ApiProperty({name:'Shipping address',type:ShippingAddressDto})
+    @ApiProperty({name:'shippingAddress',type:ShippingAddressDto})
     shippingAddress:ShippingAddressDto;
 
 }
 
 export class GetShippingAddressesResponseDTO{
   
-    @ApiProperty({name:'Total Shipping addresses', example:5})
+    @ApiProperty({name:'totalShippingAddress', example:5})
     totalShippingAddress:number
 
-    @ApiProperty({name:'Shipping Addresses',type:[ShippingAddressDto]})
+    @ApiProperty({name:'shippingAddresses',type:[ShippingAddressDto]})
     shippingAddresses:ShippingAddressDto[]
 
 }
