@@ -1,6 +1,7 @@
 
 
 export const fileFilter = ( 
+  _req: Request, 
   file: Express.Multer.File, 
   // Reemplazamos 'Function' por la firma explícita:
   callback: (error: Error | null, acceptFile: boolean) => void 

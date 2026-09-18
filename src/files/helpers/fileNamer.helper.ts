@@ -1,8 +1,8 @@
 import { v4 as uuid } from 'uuid'
-
+import { Request } from 'express';
 export const fileNamer = ( 
+  _req: Request, 
   file: Express.Multer.File, 
-  // Reemplazamos 'Function' por la firma explícita para renombrado:
   callback: (error: Error | null, filename: string) => void 
 ): void => { // <-- Especificamos el tipo de retorno 'void'
 
