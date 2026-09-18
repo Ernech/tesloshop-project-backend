@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, UseGuards, Req, Headers, SetMetadata, Res, UnauthorizedException, HttpCode, HttpStatus } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBody, ApiOkResponse, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { IncomingHttpHeaders } from 'http';
 
@@ -15,7 +15,7 @@ import { ValidRoles } from './interfaces';
 import { Response,Request } from 'express';
 import { LoginResponseDto } from './dto/login-user.dto';
 import { RefreshSessionDTO } from './dto/refresh-session.dto';
-import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
+import { Throttle } from '@nestjs/throttler';
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {

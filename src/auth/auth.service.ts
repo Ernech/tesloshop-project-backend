@@ -11,7 +11,6 @@ import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { RefreshToken } from './entities/refresh_tokens.entity';
 import { randomBytes } from 'crypto';
 import { LoginResponseDto, UserProfileDto } from './dto/login-user.dto';
-import { use } from 'passport';
 
 
 @Injectable()

@@ -6,8 +6,6 @@ import { RefreshToken } from "./entities/refresh_tokens.entity";
 import { Test, TestingModule } from "@nestjs/testing";
 import { getRepositoryToken } from "@nestjs/typeorm";
 import { ForbiddenException, UnauthorizedException } from "@nestjs/common";
-import { randomBytes } from 'crypto';
-import * as bcrypt from 'bcrypt';
 import { UserProfileDto } from "./dto/login-user.dto";
 
 describe('AuthService', () => {
