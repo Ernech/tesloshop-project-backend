@@ -1,4 +1,4 @@
-import { Controller, Inject, Post, RawBodyRequest, Req, Headers, BadRequestException, Res, InternalServerErrorException } from '@nestjs/common';
+import { Controller, Inject, Post, Req, Headers, BadRequestException, Res, InternalServerErrorException } from '@nestjs/common';
 import Stripe from 'stripe';
 
 import { Response } from 'express';

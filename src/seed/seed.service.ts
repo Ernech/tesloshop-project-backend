@@ -24,8 +24,8 @@ export class SeedService {
 
     await this.deleteTables();
    
-    const adminUser = await this.insertUsers();
-    await this.insertNewProducts( adminUser );
+    //const adminUser = await this.insertUsers();
+    await this.insertNewProducts( );
 
     return 'SEED EXECUTED';
   }
@@ -60,7 +60,7 @@ export class SeedService {
   }
 
 
-  private async insertNewProducts( user: User ) {
+  private async insertNewProducts() {
     await this.productsService.deleteAllProducts();
 
     const products = initialData.products;

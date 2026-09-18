@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from './entities/order.entity';
 import { DataSource, In, Repository } from 'typeorm';
 import { User } from 'src/auth/entities/user.entity';
-import { CreateOrderDto, CreateOrderResponseDto, GetOrderDetailDto, GetOrderDTO, CompleteOrderDto } from './dto/orders.dto';
+import { CreateOrderDto, CreateOrderResponseDto, GetOrderDetailDto, GetOrderDTO } from './dto/orders.dto';
 import { PaginatedResponseDTO } from 'src/common/dtos/pagination-reponse.dto';
 import { OrdersPaginationDto } from './dto/orders-pagination.dto';
 import Stripe from 'stripe';

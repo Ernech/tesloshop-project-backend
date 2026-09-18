@@ -24,6 +24,7 @@ export class MessagesWsGateway implements OnGatewayConnection, OnGatewayDisconne
       await this.messagesWsService.registerClient( client, payload.id );
 
     } catch (error) {
+      console.log(error);
       client.disconnect();
       return;
     }

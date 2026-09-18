@@ -1,18 +1,23 @@
 
 
-export const fileFilter = ( req: Express.Request, file: Express.Multer.File, callback: Function ) => {
+export const fileFilter = ( 
+  file: Express.Multer.File, 
+  // Reemplazamos 'Function' por la firma explícita:
+  callback: (error: Error | null, acceptFile: boolean) => void 
+): void => { // <-- Definimos también el tipo de retorno de la función principal
 
-    // console.log({ file })
-    if ( !file ) return callback( new Error('File is empty'), false );
-
-
-    const fileExptension = file.mimetype.split('/')[1];
-    const validExtensions = ['jpg','jpeg','png','gif'];
-
-    if (  validExtensions.includes( fileExptension ) ) {
-        return callback( null, true )
+    if ( !file ) {
+        callback( new Error('File is empty'), false );
+        return;
     }
 
-    callback(null, false );
+    const fileExptension = file.mimetype.split('/')[1];
+    const validExtensions = ['jpg', 'jpeg', 'png', 'gif'];
 
-}
+    if ( validExtensions.includes( fileExptension ) ) {
+        callback( null, true );
+        return;
+    }
+
+    callback( null, false );
+};

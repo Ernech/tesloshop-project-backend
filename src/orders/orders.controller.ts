@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, ParseUUIDPipe, Post, Query } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { Auth, GetUser } from 'src/auth/decorators';
 import { User } from 'src/auth/entities/user.entity';
@@ -32,7 +32,7 @@ export class OrdersController {
   @ApiResponse({status:HttpStatus.INTERNAL_SERVER_ERROR,description: 'Internal server error'})
   @Auth(ValidRoles.user)
   @Get(':id')
-  async getOrderDetail(@Param('id') id:string, @GetUser() user:User):Promise<GetOrderDetailDto>{
+  async getOrderDetail(@Param('id', ParseUUIDPipe) id:string, @GetUser() user:User):Promise<GetOrderDetailDto>{
     return this.ordersService.getOrderDetail(user, id);
   }
 

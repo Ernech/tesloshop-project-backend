@@ -1,7 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsArray, IsNotEmpty, IsNumber, IsString, IsUUID, Min } from "class-validator";
 
-import { CurrenciesEnum } from "../enums/currencies.enum";
 
 
 class ShippingAddressDTO {

@@ -36,7 +36,7 @@ export class ProductsController {
   })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 403, description: 'Forbidden. Token related.' })
-  create(@Body() createProductDto: CreateProductDto, @GetUser() user: User) {
+  create(@Body() createProductDto: CreateProductDto) {
     return this.productsService.create(createProductDto);
   }
 
@@ -56,7 +56,6 @@ export class ProductsController {
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateProductDto: UpdateProductDto,
-    @GetUser() user: User,
   ) {
     return this.productsService.update(id, updateProductDto);
   }
