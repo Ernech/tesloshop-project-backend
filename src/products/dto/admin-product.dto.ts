@@ -15,7 +15,13 @@ export class TopSellerProductDTO{
     price:number;
 
     @ApiProperty({name:"stok", description:"Product's Current Stock"})
-    stok:number;
+    stock:number;
+
+    @ApiProperty({name:"unitsSold", description:"Product's units sold"})
+    unitsSold:number;
+
+    @ApiProperty({name:"totalRevenue", description:"Total revenue obtained"})
+    totalRevenue:number;
 
 }
 
