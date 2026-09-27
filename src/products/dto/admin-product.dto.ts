@@ -33,6 +33,8 @@ export class TopSellerProductDTO extends ProductDTO{
 
 export class LowStockProductDTO extends ProductDTO{}
 
+export class DeadStockProductDTO extends ProductDTO{}
+
 export class GetTopSellersResponseDTO{
 
     @ApiProperty({name:"message", example:"Top 10 best-selling products"})
