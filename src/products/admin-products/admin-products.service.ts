@@ -2,10 +2,11 @@ import { BadRequestException, Injectable, InternalServerErrorException, Logger }
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from '../entities';
 import { Repository } from 'typeorm';
-import { GetTopSellersResponseDTO, TopSellerProductDTO } from '../dto/admin-product.dto';
+import { GetTopSellersResponseDTO, LowStockProductDTO, TopSellerProductDTO } from '../dto/admin-product.dto';
 import { OrderItem } from 'src/orders/entities/order-item.entity';
 import { OrderStatus } from 'src/orders/enums/order-status.enum';
 import { plainToInstance } from 'class-transformer';
+import { PaginatedResponseDTO } from 'src/common/dtos/pagination-reponse.dto';
 
 @Injectable()
 export class AdminProductsService {
@@ -22,12 +23,11 @@ export class AdminProductsService {
             .select([
                 "product.id AS id",
                 "product.title AS title",
-                "product.sku AS sku",
+                "product.slug AS slug",
                 "product.price AS price",
                 "product.stock AS stok"
             ]).addSelect('SUM(orderItem.quantity)','unitsSold')
             .addSelect('SUM(orderItem.quantity*orderItem.price)','totalRevenue')
-            .innerJoin('product.orderItem','orderItem')
             .innerJoin(OrderItem, 'orderItem', 'orderItem.product.id = product.id')
             .innerJoin('orderItem.order', 'order', 'order.status = :status', { status: OrderStatus.PAID })
             .groupBy('product.id')
@@ -49,6 +49,39 @@ export class AdminProductsService {
 
     }
 
+    async getLowStockAlerts(threshold:number = 5, page:number =1, limit:number=5):Promise<PaginatedResponseDTO<LowStockProductDTO>>{
+        try {
+            const skip = (page-1)*limit;
+            const [products,total] = await this.productsRepository.createQueryBuilder('product')
+            .select()
+            .where('product.stock<=:threshold',{threshold})
+            .andWhere('product.isActive=:isActive',{isActive:true})
+            .orderBy('product.stock','ASC')
+            .skip(skip)
+            .take(limit)
+            .getManyAndCount();
+
+            return{
+                totalItems:products.length,
+                pageNumber:page,
+                pageSize:limit,
+                totalPages: Math.ceil(total / limit),
+                items:products.map(product=>({
+                    id:product.id,
+                    title:product.title,
+                    price:product.price,
+                    slug:product.slug,
+                    stock:product.stock
+                }))
+            }
+
+
+        } catch (error) {
+            this.handleDBExceptions(error);
+        }
+
+
+    }
     
     
       private handleDBExceptions(error: any) {
@@ -61,5 +94,6 @@ export class AdminProductsService {
         );
       }
 
+    
 
 }

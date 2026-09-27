@@ -2,6 +2,10 @@ import { applyDecorators, Type } from "@nestjs/common";
 import { ApiOkResponse, ApiProperty, getSchemaPath } from "@nestjs/swagger";
 
 export class PaginatedResponseDTO<T>{
+
+    @ApiProperty({description:'Number of total items'})
+    totalItems:number;
+
     @ApiProperty({description:'Number of the current page'})
     pageNumber:number;
 

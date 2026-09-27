@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 
-export class TopSellerProductDTO{
+export class ProductDTO{
 
     @ApiProperty({name:"id",description:"Product's id"})
     id:string;
@@ -8,14 +8,20 @@ export class TopSellerProductDTO{
     @ApiProperty({name:"title", description:"Product's Name"})
     title:string;
 
-    @ApiProperty({name:"sku", description:"Product's SKU"})
-    sku:string;
+    @ApiProperty({name:"slug", description:"Product's slug"})
+    slug:string;
 
     @ApiProperty({name:"price", description:"Product's Price"})
     price:number;
 
     @ApiProperty({name:"stok", description:"Product's Current Stock"})
     stock:number;
+
+   
+
+}
+
+export class TopSellerProductDTO extends ProductDTO{
 
     @ApiProperty({name:"unitsSold", description:"Product's units sold"})
     unitsSold:number;
@@ -24,6 +30,8 @@ export class TopSellerProductDTO{
     totalRevenue:number;
 
 }
+
+export class LowStockProductDTO extends ProductDTO{}
 
 export class GetTopSellersResponseDTO{
 

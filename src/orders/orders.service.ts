@@ -157,6 +157,7 @@ export class OrdersService {
                 }));
 
           return {
+            totalItems:items.length,
             pageNumber: offset,
             pageSize: limit,
             totalPages,

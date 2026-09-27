@@ -90,6 +90,9 @@ export class Product {
     })
     tags: string[];
     
+    @Column('boolean',{name:'is_active',default:true})
+    isActive:boolean;
+
     @ApiProperty({ readOnly: true, example: '2026-08-03T20:15:00.000Z' })
     @CreateDateColumn({
         name: 'created_at',
