@@ -130,8 +130,8 @@ export class OrdersService {
     //TODO: Ajustar query builder para la dirección de envío
     async getUserOrders(user:User, orderPaginationDto:OrdersPaginationDto):Promise<PaginatedResponseDTO<GetOrderDTO>>{
         try {
-            const {limit,offset} = orderPaginationDto;
-            const skip = (offset-1) *limit;
+            const {limit=5,page=1} = orderPaginationDto;
+            const skip = (page-1) *limit;
             const [orders,totalCount] = await this.ordersRepository.createQueryBuilder('order')
             .innerJoin('order.user', 'user')
             .select([
@@ -158,7 +158,7 @@ export class OrdersService {
 
           return {
             totalItems:items.length,
-            pageNumber: offset,
+            pageNumber: page,
             pageSize: limit,
             totalPages,
             items,

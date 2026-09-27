@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { BasePaginationDto } from "src/common/dtos/base-pagination.dto.ts";
 
 export class ProductDTO{
 
@@ -46,4 +47,13 @@ export class GetTopSellersResponseDTO{
     @ApiProperty({name:"products",type:[TopSellerProductDTO]})
     products:TopSellerProductDTO[]
 
+}
+
+export class LowStockPaginationDTO extends BasePaginationDto{
+    
+    @ApiProperty({
+        name:'threshold',
+        description:'Low Stock Products threshold'
+    })
+    threshold:number;
 }

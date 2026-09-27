@@ -15,12 +15,12 @@ export class BasePaginationDto {
 
   @ApiProperty({
     default: 0,
-    description: 'How many rows do you want to skip',
+    description: 'Which page number ypu want to get',
   })
   @IsOptional()
   @Min(0)
   @Type(() => Number) // enableImplicitConversions: true
-  offset?: number;
+  page?: number;
 
  
 }

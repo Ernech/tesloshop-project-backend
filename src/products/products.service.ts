@@ -50,11 +50,11 @@ export class ProductsService {
   }
 
   async findAll(paginationDto: ProductPaginationDto) {
-    const { limit = 10, offset = 0, gender = '' } = paginationDto;
-
+    const { limit = 10, page = 1, gender = '' } = paginationDto;
+    const skip = (page -1)*limit;
     const products = await this.productRepository.find({
       take: limit,
-      skip: offset,
+      skip: skip,
       relations: {
         images: true,
       },
