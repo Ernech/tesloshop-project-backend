@@ -14,11 +14,11 @@ export class BasePaginationDto {
   limit?: number;
 
   @ApiProperty({
-    default: 0,
-    description: 'Which page number ypu want to get',
+    default: 1,
+    description: 'Which page number you want to get',
   })
   @IsOptional()
-  @Min(0)
+  @Min(1)
   @Type(() => Number) // enableImplicitConversions: true
   page?: number;
 

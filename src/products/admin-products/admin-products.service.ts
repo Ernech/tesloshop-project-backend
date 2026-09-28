@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, InternalServerErrorException, Logger }
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from '../entities';
 import { Repository } from 'typeorm';
-import { DeadStockProductDTO, GetTopSellersResponseDTO, LowStockProductDTO, TopSellerProductDTO } from '../dto/admin-product.dto';
+import { DeadStockProductDTO, DeadStockProductResponseDTO, GetTopSellersResponseDTO, LowStockProductDTO, TopSellerProductDTO } from '../dto/admin-product.dto';
 import { OrderItem } from 'src/orders/entities/order-item.entity';
 import { OrderStatus } from 'src/orders/enums/order-status.enum';
 import { plainToInstance } from 'class-transformer';
@@ -84,7 +84,7 @@ export class AdminProductsService {
 
     }
     
-    async getDeadStock(daysAgo:number=30):Promise<DeadStockProductDTO[]>{
+    async getDeadStock(daysAgo:number=30):Promise<DeadStockProductResponseDTO>{
         try {
             const targetDate = new Date();
             targetDate.setDate(targetDate.getDate()-daysAgo);
@@ -104,14 +104,18 @@ export class AdminProductsService {
             .orderBy('product.stock','DESC')
             .getMany();
             
-            return deadStockProducts.map(product=>({
+            return {
+                message:`Getting the dead stock from the last ${daysAgo} days`,
+               products:deadStockProducts.map(product=>({
                      id:product.id,
                     title:product.title,
                     price:product.price,
                     slug:product.slug,
                     stock:product.stock
                 }
-            ));
+            ))
+            }
+            
 
 
         } catch (error) {
