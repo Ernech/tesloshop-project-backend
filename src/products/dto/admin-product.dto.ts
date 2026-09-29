@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { Type } from "class-transformer";
 import { IsOptional, Min } from "class-validator";
 import { BasePaginationDto } from "src/common/dtos/base-pagination.dto.ts";
 
@@ -55,8 +56,10 @@ export class LowStockPaginationDTO extends BasePaginationDto{
     @ApiProperty({
         name:'threshold',
         description:'Low Stock Products threshold',
-        default:10
+        default:10,
+        required:false
     })
+    @Type(()=>Number)
     @IsOptional()
     @Min(0)
     threshold?:number;

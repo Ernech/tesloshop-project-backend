@@ -1,5 +1,5 @@
 import { Controller, Get, HttpStatus, Query } from '@nestjs/common';
-import { RoleProtected } from 'src/auth/decorators';
+import { Auth } from 'src/auth/decorators';
 import { ValidRoles } from 'src/auth/interfaces';
 import { AdminProductsService } from './admin-products.service';
 import { DeadStockProductResponseDTO, GetTopSellersResponseDTO, LowStockPaginationDTO, LowStockProductDTO } from '../dto/admin-product.dto';
@@ -17,7 +17,7 @@ export class AdminProductsController {
     @ApiOkResponse({type:GetTopSellersResponseDTO})
     @ApiResponse({status:HttpStatus.INTERNAL_SERVER_ERROR, description:'Internal Server Error'})
     @Get('/best-seeling')
-    @RoleProtected(ValidRoles.admin)
+    @Auth(ValidRoles.admin)
     async getBestSellingProducts(@Query('limit') limit:number):Promise<GetTopSellersResponseDTO>{
         return await this.adminProductsService.getTopBestSellingProducts(limit);
     }
@@ -26,7 +26,7 @@ export class AdminProductsController {
     @ApiPaginatedResponse(LowStockProductDTO)
     @ApiResponse({status:HttpStatus.INTERNAL_SERVER_ERROR, description:'Internal Server Error'})
     @Get('/low-stock')
-    @RoleProtected(ValidRoles.admin)
+    @Auth(ValidRoles.admin)
     async getLowStockProducts(@Query() lowSotckPagination:LowStockPaginationDTO):Promise<PaginatedResponseDTO<LowStockProductDTO>>{
         return await this.adminProductsService.getLowStockAlerts(lowSotckPagination.threshold,lowSotckPagination.page,lowSotckPagination.limit)
     }
@@ -35,7 +35,7 @@ export class AdminProductsController {
     @ApiPaginatedResponse(LowStockProductDTO)
     @ApiResponse({status:HttpStatus.INTERNAL_SERVER_ERROR, description:'Internal Server Error'})
     @Get('/dead-stock')
-    @RoleProtected(ValidRoles.admin)
+    @Auth(ValidRoles.admin)
     async getDeadStockProducts(@Query('daysAgo') daysAgo:number):Promise<DeadStockProductResponseDTO>{
         return await this.adminProductsService.getDeadStock(daysAgo);
 
