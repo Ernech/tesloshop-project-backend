@@ -1,16 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AdminProductsService } from './admin-products.service';
 import { Repository } from 'typeorm';
-import { Product, ProductImage } from '../entities';
 import { OrderItem } from 'src/orders/entities/order-item.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { TopSellerProductDTO } from '../dto/admin-product.dto';
-import { OrderStatus } from 'src/orders/enums/order-status.enum';
+import { Product } from '../entities';
 
 describe('AdminProductsService', () => {
    let adminProductService: AdminProductsService;
    let productRepository:Repository<Product>;
-   let orderItemRepository:Repository<OrderItem>;
    let dataSourceMock: any;
    const queryBuilderMock = {
     select: jest.fn().mockReturnThis(),
@@ -50,7 +47,7 @@ describe('AdminProductsService', () => {
       ],
     }).compile();
     productRepository = module.get<Repository<Product>>(getRepositoryToken(Product));
-    orderItemRepository = module.get<Repository<OrderItem>>(getRepositoryToken(OrderItem));
+  
     adminProductService = module.get<AdminProductsService>(AdminProductsService);
   });
 
