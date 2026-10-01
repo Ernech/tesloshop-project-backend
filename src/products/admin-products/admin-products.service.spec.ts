@@ -1,9 +1,9 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { AdminProductsService } from './admin-products.service';
-import { Repository } from 'typeorm';
-import { OrderItem } from 'src/orders/entities/order-item.entity';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { Product } from '../entities';
+// import { Test, TestingModule } from '@nestjs/testing';
+// import { AdminProductsService } from './admin-products.service';
+// import { Repository } from 'typeorm';
+// import { OrderItem } from 'src/orders/entities/order-item.entity';
+// import { getRepositoryToken } from '@nestjs/typeorm';
+// import { Product } from '../entities';
 
 describe('AdminProductsService', () => {
   //  let adminProductService: AdminProductsService;
