@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, InternalServerErrorException, Logger }
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from '../entities';
 import { Repository } from 'typeorm';
-import { DeadStockProductDTO, DeadStockProductResponseDTO, GetTopSellersResponseDTO, LowStockProductDTO, TopSellerProductDTO } from '../dto/admin-product.dto';
+import {  DeadStockProductResponseDTO, GetTopSellersResponseDTO, LowStockProductDTO, TopSellerProductDTO } from '../dto/admin-product.dto';
 import { OrderItem } from 'src/orders/entities/order-item.entity';
 import { OrderStatus } from 'src/orders/enums/order-status.enum';
 import { plainToInstance } from 'class-transformer';
@@ -33,7 +33,7 @@ export class AdminProductsService {
             .innerJoin(OrderItem, 'orderItem', 'orderItem.product.id = product.id')
             .innerJoin('orderItem.order', 'order', 'order.status = :status', { status: OrderStatus.PAID })
             .groupBy('product.id')
-            .orderBy('\"unitsSold\"', 'DESC') 
+            .orderBy('unitsSold', 'DESC') 
             .limit(limit)
             .getRawMany();
 
