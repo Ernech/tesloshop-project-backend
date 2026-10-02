@@ -9,10 +9,12 @@ import { Transaction } from './entities/transaction.entity';
 import { StripeModule } from 'src/stripe/stripe.module';
 import { Product } from 'src/products/entities';
 import { AuthModule } from 'src/auth/auth.module';
+import { AdminOrdersService } from './admin-orders/admin-orders.service';
+import { AdminOrdersController } from './admin-orders/admin-orders.controller';
 
 @Module({
-  controllers: [OrdersController],
-  providers: [OrdersService],
+  controllers: [OrdersController, AdminOrdersController],
+  providers: [OrdersService, AdminOrdersService],
   imports:[AuthModule,TypeOrmModule.forFeature([Order,OrderItem, Product,Transaction,AddressEntity]),forwardRef(() => StripeModule)],
   exports:[OrdersService]
 })

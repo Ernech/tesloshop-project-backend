@@ -29,7 +29,7 @@ export class Order{
     };
 
 
-    @CreateDateColumn({ type: 'timestamp with time zone', name: 'created_at' })
+    @CreateDateColumn({ type: 'timestamp with time zone', name: 'created_at', default:'CURRENT_TIMESTAMP' })
     createdAt: Date;
 
 
