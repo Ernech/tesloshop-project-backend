@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { FinancialKPIsDto } from '../dto/finantial-kpis.dto';
 import { OrderStatus } from '../enums/order-status.enum';
 import { DateIntervals } from '../enums/date-intervals.enum';
+import { SalesTrendsResponseDto } from '../dto/stales-trend.dto';
 
 @Injectable()
 export class AdminOrdersService {
@@ -17,6 +18,9 @@ export class AdminOrdersService {
 
     async getFinantialKPIs(startDate:Date, endDate:Date):Promise<FinancialKPIsDto>{
         try {
+            if (startDate > endDate) {
+                throw new BadRequestException('startDate cannot be greater than endDate');
+            }
             const endOfDay = new Date(endDate);
             endOfDay.setHours(23,59,59,999);
             const financialRaw = await this.orderRepository.createQueryBuilder('order')
@@ -55,8 +59,11 @@ export class AdminOrdersService {
         }
     }
 
-    async getSalesTrend(startDate:Date, endDate:Date, interval:DateIntervals=DateIntervals.DAY){
+    async getSalesTrend(startDate:Date, endDate:Date, interval:DateIntervals=DateIntervals.DAY):Promise<SalesTrendsResponseDto>{
         try {
+            if (startDate > endDate) {
+                throw new BadRequestException('startDate cannot be greater than endDate');
+            }
             const endOfDay = new Date(endDate);
             endOfDay.setHours(23,59,59,999);
             const dateTruncFormat = interval === DateIntervals.MONTH ? DateIntervals.MONTH : DateIntervals.DAY;
@@ -71,7 +78,15 @@ export class AdminOrdersService {
             .groupBy(`DATE_TRUNC(${dateTruncFormat}, order.createdAt)`)
             .orderBy(`DATE_TRUNC(${dateTruncFormat}, order.createdAt)`,'ASC')
             .getRawMany()
-            
+
+            return{
+                message:`Sales trend since ${startDate} until ${endDate}`,
+                items: rawData.map(item => ({
+                        period: item.datePeriod,
+                        revenue: Number(item.revenue || 0),
+                        ordersCount: Number(item.ordersCount || 0),
+                    }))
+                }
         } catch (error) {
             this.handleDBExceptions(error);
         }

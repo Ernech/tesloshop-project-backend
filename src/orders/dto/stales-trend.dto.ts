@@ -1,16 +1,9 @@
-import { IsDateString, IsEnum, IsOptional } from "class-validator";
+import { IsEnum, IsOptional } from "class-validator";
 import { DateIntervals } from "../enums/date-intervals.enum";
 import { ApiProperty } from "@nestjs/swagger";
+import { DashboardQueryDto } from "./dashboard-query.dt";
 
-export class SalesTrendQueryParamsDto{
-
-    @ApiProperty({name:'startDate',example:'2026-10-01'})
-    @IsDateString({},{message:'startDate must be a valid ISO date (YYYY-MM-DD)'})
-    startDate:Date;
-
-    @ApiProperty({name:'startDate',example:'2026-11-01'})
-    @IsDateString({},{message:'endtDate must be a valid ISO date (YYYY-MM-DD)'})
-    endtDate:Date;
+export class SalesTrendQueryParamsDto extends DashboardQueryDto{
 
     @ApiProperty({name:'interval',example:'day'})
     @IsEnum(DateIntervals,{message:'inverval must be either "day" or "month"'})
