@@ -4,6 +4,7 @@ import { Order } from '../entities/order.entity';
 import { Repository } from 'typeorm';
 import { FinancialKPIsDto } from '../dto/finantial-kpis.dto';
 import { OrderStatus } from '../enums/order-status.enum';
+import { DateIntervals } from '../enums/date-intervals.enum';
 
 @Injectable()
 export class AdminOrdersService {
@@ -54,7 +55,27 @@ export class AdminOrdersService {
         }
     }
 
-    
+    async getSalesTrend(startDate:Date, endDate:Date, interval:DateIntervals=DateIntervals.DAY){
+        try {
+            const endOfDay = new Date(endDate);
+            endOfDay.setHours(23,59,59,999);
+            const dateTruncFormat = interval === DateIntervals.MONTH ? DateIntervals.MONTH : DateIntervals.DAY;
+
+            const rawData = await this.orderRepository.createQueryBuilder('order')
+            .select([
+                `DATE_TRUNC(${dateTruncFormat},order.createdAt) AS datePeriod`,
+                'SUM(order.total) AS totalRevenue',
+                'COUNT(order.id) AS ordersCount'
+            ]).where('order.status=:status',{status:OrderStatus.PAID})
+            .andWhere('order.createdAt BETWEEN :startDate AND :endDate',{startDate,endDate:endOfDay})
+            .groupBy(`DATE_TRUNC(${dateTruncFormat}, order.createdAt)`)
+            .orderBy(`DATE_TRUNC(${dateTruncFormat}, order.createdAt)`,'ASC')
+            .getRawMany()
+            
+        } catch (error) {
+            this.handleDBExceptions(error);
+        }
+    }
 
     
       private handleDBExceptions(error: any) {
