@@ -3,9 +3,10 @@ import { Auth } from 'src/auth/decorators';
 import { ValidRoles } from 'src/auth/interfaces';
 import { AdminProductsService } from './admin-products.service';
 import { DeadStockProductResponseDTO, GetTopSellersResponseDTO, LowStockPaginationDTO, LowStockProductDTO } from '../dto/admin-product.dto';
-import { ApiOkResponse, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiOkResponse, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ApiPaginatedResponse, PaginatedResponseDTO } from 'src/common/dtos/pagination-reponse.dto';
 
+@ApiTags('Admin Dashboard Products')
 @Controller('admin/products')
 export class AdminProductsController {
 
