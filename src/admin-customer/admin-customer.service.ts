@@ -3,15 +3,19 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/auth/entities/user.entity';
 import { Repository } from 'typeorm';
 import { TopCustomersDto } from './dto/top-customers.dto';
-import { OrderItem } from 'src/orders/entities/order-item.entity';
 import { OrderStatus } from 'src/orders/enums/order-status.enum';
+import { CustomerRetentionDto } from './dto/customer-retention.dto';
+import { Order } from 'src/orders/entities/order.entity';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class AdminCustomerService {
 
     private readonly logger = new Logger('AdminCustomersService');
 
-    constructor(@InjectRepository(User) private readonly usersRepository:Repository<User>){}
+    constructor(
+        @InjectRepository(User) private readonly usersRepository:Repository<User>,
+        @InjectRepository(Order) private readonly orderRepository:Repository<Order>){}
 
     async getTopCustomers(limit:number=10):Promise<TopCustomersDto[]>{
         try {
@@ -38,6 +42,39 @@ export class AdminCustomerService {
                 ordersCount:customer.ordersCount
         })); 
 
+        } catch (error) {
+            this.handleDBExceptions(error);
+        }
+    }
+
+    async getCustomersRetention():Promise<CustomerRetentionDto>{
+        try {
+            const userOrderCountRaw = await this.orderRepository.createQueryBuilder('order')
+                                    .select([
+                                        'order.user.id as userId',
+                                        'COUNT(order.id) as paidCount'
+                                    ])
+                                    .where('order.status = :status',{status:OrderStatus.PAID})
+                                    .groupBy('order.user.id')
+                                    .getRawMany();
+            let oneTimeBuyers = 0;
+            let recurringBuyers = 0;
+
+            userOrderCountRaw.forEach((item)=>{
+                const count = Number(item.paidCount);
+                if (count === 1) oneTimeBuyers++;
+                if(count>1) recurringBuyers++;
+            });
+
+            const totalBuyers = oneTimeBuyers + recurringBuyers;
+            const recurrenceRate = totalBuyers > 0 ? (recurringBuyers / totalBuyers) * 100 : 0;
+
+            return plainToInstance(CustomerRetentionDto, {
+                oneTimeBuyers,
+                recurringBuyers,
+                recurrenceRate
+            });
+                                     
         } catch (error) {
             this.handleDBExceptions(error);
         }
