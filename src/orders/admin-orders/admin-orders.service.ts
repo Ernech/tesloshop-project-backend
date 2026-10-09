@@ -10,7 +10,7 @@ import { SalesTrendsResponseDto } from '../dto/stales-trend.dto';
 @Injectable()
 export class AdminOrdersService {
 
-      private readonly logger = new Logger('AdminOrdersService');
+    private readonly logger = new Logger('AdminOrdersService');
 
     constructor(@InjectRepository(Order) private orderRepository:Repository<Order>){
     }

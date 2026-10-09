@@ -4,16 +4,23 @@ import Stripe from 'stripe';
 import { StripeController } from './stripe.controller';
 import { OrdersModule } from 'src/orders/orders.module';
 import { STRIPE_CLIENT } from './stripe.constants';
+import { AdminStripeController } from './admin-stripe/admin-stripe.controller';
+import { AdminStripeService } from './admin-stripe/admin-stripe.service';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Transaction } from 'src/orders/entities/transaction.entity';
 
 @Global()
-@Module({})
+@Module({
+  controllers: [AdminStripeController],
+  providers: [AdminStripeService]
+})
 export class StripeModule {
     static forRootAsync():DynamicModule {
 
        return {
       module: StripeModule,
       controllers:[StripeController],
-      imports: [forwardRef(() => OrdersModule), ConfigModule],
+      imports: [forwardRef(() => OrdersModule), ConfigModule, TypeOrmModule.forFeature([Transaction])],
       providers: [
         {
           provide: STRIPE_CLIENT,
