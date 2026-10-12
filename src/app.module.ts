@@ -17,6 +17,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { StripeModule } from './stripe/stripe.module';
 import { ShippingAddressModule } from './shipping-address/shipping-address.module';
 import { AdminCustomerModule } from './admin-customer/admin-customer.module';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
@@ -69,6 +70,11 @@ import { AdminCustomerModule } from './admin-customer/admin-customer.module';
 
 
     AdminCustomerModule,
+    CacheModule.register({
+      isGlobal: true,
+      ttl: 60 * 1000, 
+      max: 100, 
+    })
 
   ],
   providers:[

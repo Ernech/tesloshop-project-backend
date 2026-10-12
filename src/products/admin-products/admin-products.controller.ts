@@ -1,10 +1,11 @@
-import { Controller, Get, HttpStatus, Query } from '@nestjs/common';
+import { Controller, Get, HttpStatus, Query, UseInterceptors } from '@nestjs/common';
 import { Auth } from 'src/auth/decorators';
 import { ValidRoles } from 'src/auth/interfaces';
 import { AdminProductsService } from './admin-products.service';
 import { DeadStockProductResponseDTO, GetTopSellersResponseDTO, LowStockPaginationDTO, LowStockProductDTO } from '../dto/admin-product.dto';
 import { ApiOkResponse, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ApiPaginatedResponse, PaginatedResponseDTO } from 'src/common/dtos/pagination-reponse.dto';
+import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 
 @ApiTags('Admin Dashboard Products')
 @Controller('admin/products')
@@ -19,6 +20,8 @@ export class AdminProductsController {
     @ApiResponse({status:HttpStatus.INTERNAL_SERVER_ERROR, description:'Internal Server Error'})
     @Get('/best-seeling')
     @Auth(ValidRoles.admin)
+    @UseInterceptors(CacheInterceptor)
+    @CacheTTL(15 * 60 * 1000)
     async getBestSellingProducts(@Query('limit') limit:number):Promise<GetTopSellersResponseDTO>{
         return await this.adminProductsService.getTopBestSellingProducts(limit);
     }

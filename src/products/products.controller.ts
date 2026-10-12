@@ -8,6 +8,7 @@ import {
   Delete,
   ParseUUIDPipe,
   Query,
+  UseInterceptors
 } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 
@@ -19,6 +20,8 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { Auth } from '../auth/decorators';
 import { ValidRoles } from '../auth/interfaces';
 import { ProductPaginationDto } from './dto/product-pagination.dto';
+import { CacheInterceptor } from '@nestjs/cache-manager';
+
 
 
 @ApiTags('Products')
@@ -40,12 +43,14 @@ export class ProductsController {
   }
 
   @Get()
+  @UseInterceptors(CacheInterceptor)
   findAll(@Query() paginationDto: ProductPaginationDto) {
     // console.log(paginationDto)
     return this.productsService.findAll(paginationDto);
   }
 
   @Get(':term')
+  @UseInterceptors(CacheInterceptor)
   findOne(@Param('term') term: string) {
     return this.productsService.findOnePlain(term);
   }

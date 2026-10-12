@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -14,6 +15,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { validate as isUUID } from 'uuid';
 import { ProductImage, Product } from './entities';
 import { ProductPaginationDto } from './dto/product-pagination.dto';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 @Injectable()
 export class ProductsService {
@@ -27,6 +29,7 @@ export class ProductsService {
     private readonly productImageRepository: Repository<ProductImage>,
 
     private readonly dataSource: DataSource,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache
   ) {}
 
   async create(createProductDto: CreateProductDto) {
@@ -61,7 +64,7 @@ export class ProductsService {
       order: {
         id: 'ASC',
       },
-      where: gender ? [{ gender }, { gender: 'unisex' }] : {},
+      where: gender ? [{ gender }, { gender: 'unisex' },{isActive:true}] : {isActive:true},
     });
 
     const totalProducts = await this.productRepository.count({
@@ -90,6 +93,7 @@ export class ProductsService {
           title: term.toUpperCase(),
           slug: term.toLowerCase(),
         })
+        .andWhere('prod.isActive=:isActive',{isActive:true})
         .leftJoinAndSelect('prod.images', 'prodImages')
         .getOne();
     }
@@ -136,7 +140,8 @@ export class ProductsService {
 
       await queryRunner.commitTransaction();
       await queryRunner.release();
-
+      await this.cacheManager.delete('/products');
+      await this.cacheManager.delete(`/products/${id}`); 
       return this.findOnePlain(id);
     } catch (error) {
       await queryRunner.rollbackTransaction();
@@ -146,8 +151,19 @@ export class ProductsService {
   }
 
   async remove(id: string) {
-    const product = await this.findOne(id);
-    await this.productRepository.remove(product);
+    try {
+      
+      const product = await this.findOne(id);
+      if(!product){
+        throw new NotFoundException(`The product with the id ${id} does not exists.`)
+      }
+      product.isActive = false
+      await this.productRepository.save(product);
+       await this.cacheManager.delete('/products');
+      await this.cacheManager.delete(`/products/${id}`); 
+    } catch (error) {
+      this.handleDBExceptions(error);
+    }
   }
 
   private handleDBExceptions(error: any) {
