@@ -1,4 +1,4 @@
-import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { BeforeInsert, BeforeUpdate, Column, Entity, Index, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { RefreshToken } from './refresh_tokens.entity';
 import { Order } from 'src/orders/entities/order.entity';
 import { AddressEntity } from 'src/shipping-address/entities/address.entity';
@@ -10,6 +10,7 @@ export class User {
     @PrimaryGeneratedColumn('uuid',{name:'user_id'})
     id: string;
 
+    @Index('IDX_user_email', { unique: true })
     @Column('text', {
         unique: true
     })
@@ -50,6 +51,7 @@ export class User {
     @Column('timestamp with time zone',{name:'block_until',nullable:true})
     blockUntil:Date | null;
     
+    @Index('IDX_user_order_id')
     @OneToMany(() => Order, (order) => order.user)
     orders: Order[];
 
