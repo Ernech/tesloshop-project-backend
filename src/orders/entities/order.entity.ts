@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { OrderItem } from "./order-item.entity";
 import { User } from "src/auth/entities/user.entity";
 import { OrderStatus } from "../enums/order-status.enum";
@@ -16,6 +16,7 @@ export class Order{
     @Column('numeric', { name:'total', precision: 10, scale: 2 })
     total: number;
 
+    @Index('IDX_order_status')
     @Column({type:"enum",enum:OrderStatus, default: OrderStatus.PENDING }) 
     status: OrderStatus;
 

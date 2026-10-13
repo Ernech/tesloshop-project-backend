@@ -180,6 +180,7 @@ export class ProductsService {
     const query = this.productRepository.createQueryBuilder('product');
 
     try {
+      await this.cacheManager.delete('/products');
       return await query.delete().execute();
     } catch (error) {
       this.handleDBExceptions(error);

@@ -1,9 +1,10 @@
-import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, Index, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 
 import { ProductImage } from './';
 
 @Entity({ name: 'products' })
+@Index('IDX_product_active_gender', ['isActive', 'gender'])
 export class Product {
 
     @ApiProperty({
@@ -89,11 +90,12 @@ export class Product {
         default: []
     })
     tags: string[];
-    
+    @Index()
     @Column('boolean',{name:'is_active',default:true})
     isActive:boolean;
 
     @ApiProperty({ readOnly: true, example: '2026-08-03T20:15:00.000Z' })
+    @Index()
     @CreateDateColumn({
         name: 'created_at',
         type: 'timestamp', 

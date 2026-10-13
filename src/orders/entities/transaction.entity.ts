@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Order } from "./order.entity";
 
 @Entity('transaction')
@@ -7,7 +7,8 @@ export class Transaction {
   @PrimaryGeneratedColumn('uuid',{name:'transaction_id',})  
   id: string; 
  
-  @Column('varchar',{name:'stripe_payment_intent_id', length:350})
+  @Index('IDX_transaction_payment_intent', { unique: true })
+  @Column('varchar',{name:'stripe_payment_intent_id', length:350, unique:true})
   stripePaymentIntentId: string; 
   
   @Column('numeric',{name:'amount', precision: 10, scale: 2 })
@@ -16,6 +17,7 @@ export class Transaction {
   @Column('varchar',{name:'currency',length:50})
   currency:string;
   
+  @Index('IDX_transaction_status')
   @Column('varchar',{name:'status',length:150})
   status: string; // 'succeeded', 'failed', 'processing' (Stripe status)
   
@@ -42,6 +44,7 @@ export class Transaction {
     }) 
   updatedAt: Date;
 
+  @Index('IDX_transaction_order_id')
   @ManyToOne(() => Order, { onDelete: 'RESTRICT' }) 
   @JoinColumn({name:'order_id',referencedColumnName:'id'})
   order: Order; // Relación con tu tabla de órdenes
