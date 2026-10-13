@@ -15,7 +15,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { validate as isUUID } from 'uuid';
 import { ProductImage, Product } from './entities';
 import { ProductPaginationDto } from './dto/product-pagination.dto';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 
 @Injectable()
 export class ProductsService {
@@ -140,8 +140,8 @@ export class ProductsService {
 
       await queryRunner.commitTransaction();
       await queryRunner.release();
-      await this.cacheManager.delete('/products');
-      await this.cacheManager.delete(`/products/${id}`); 
+      await this.cacheManager.del('/products');
+      await this.cacheManager.del(`/products/${id}`); 
       return this.findOnePlain(id);
     } catch (error) {
       await queryRunner.rollbackTransaction();
@@ -159,8 +159,8 @@ export class ProductsService {
       }
       product.isActive = false
       await this.productRepository.save(product);
-       await this.cacheManager.delete('/products');
-      await this.cacheManager.delete(`/products/${id}`); 
+       await this.cacheManager.del('/products');
+      await this.cacheManager.del(`/products/${id}`); 
     } catch (error) {
       this.handleDBExceptions(error);
     }
@@ -180,7 +180,7 @@ export class ProductsService {
     const query = this.productRepository.createQueryBuilder('product');
 
     try {
-      await this.cacheManager.delete('/products');
+      await this.cacheManager.del('/products');
       return await query.delete().execute();
     } catch (error) {
       this.handleDBExceptions(error);

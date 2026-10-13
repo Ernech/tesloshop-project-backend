@@ -51,7 +51,6 @@ export class User {
     @Column('timestamp with time zone',{name:'block_until',nullable:true})
     blockUntil:Date | null;
     
-    @Index('IDX_user_order_id')
     @OneToMany(() => Order, (order) => order.user)
     orders: Order[];
 

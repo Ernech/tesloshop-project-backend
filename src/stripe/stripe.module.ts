@@ -10,18 +10,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Transaction } from 'src/orders/entities/transaction.entity';
 
 @Global()
-@Module({
-  controllers: [AdminStripeController],
-  providers: [AdminStripeService]
-})
+@Module({})
 export class StripeModule {
     static forRootAsync():DynamicModule {
 
        return {
       module: StripeModule,
-      controllers:[StripeController],
+      controllers:[StripeController, AdminStripeController],
       imports: [forwardRef(() => OrdersModule), ConfigModule, TypeOrmModule.forFeature([Transaction])],
-      providers: [
+      providers: [AdminStripeService,
         {
           provide: STRIPE_CLIENT,
           useFactory: (configService: ConfigService) => {

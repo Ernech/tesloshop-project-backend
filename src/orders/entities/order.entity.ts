@@ -33,7 +33,7 @@ export class Order{
     @CreateDateColumn({ type: 'timestamp with time zone', name: 'created_at',default:()=>'CURRENT_TIMESTAMP' })
     createdAt: Date;
 
-
+    @Index('IDX_user_order_id')
     @ManyToOne(() => User, (user) => user.orders, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'user_id' ,referencedColumnName:"id"}) 
     user: User;
