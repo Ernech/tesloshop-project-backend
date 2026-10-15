@@ -91,9 +91,9 @@ export class OrdersService {
                     country:shippingAddress.country
                 },
                 items:orderItems,
-                user:user
+                user:user,
+                transactions:[]
             });
-            await this.ordersRepository.save(newOrder);
             //Create a stripe payment intent
             const paymentIntent = await this.stripe.paymentIntents.create({
                 amount:totalAmountInCents,
@@ -171,6 +171,7 @@ export class OrdersService {
     }
 
     async fulfillOrder(paymentIntentId:string){
+        console.log(paymentIntentId);
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
         await queryRunner.startTransaction();
@@ -190,7 +191,7 @@ export class OrdersService {
             .where('transaction.stripePaymentIntentId=:paymentIntentId',{paymentIntentId})
             .getOne();
              if(!order){
-                throw new NotFoundException(`The order "${order.id}" does not exists`)
+                throw new NotFoundException(`The order does not exists`)
              }
              if(order.status==OrderStatus.PAID){
                 //Prevent to process a payment twice

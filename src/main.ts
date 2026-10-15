@@ -6,10 +6,20 @@ import { AppModule } from './app.module';
 import cookieParser from 'cookie-parser';
 import { PaginatedResponseDTO } from './common/dtos/pagination-reponse.dto';
 import { GetOrderDTO } from './orders/dto/orders.dto';
-
+import * as express from 'express'; 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule,{rawBody:true});
   const logger = new Logger('Bootstrap');
+
+  app.use(
+    express.json({
+      verify: (req: any, res, buf) => {
+        if (req.url.includes('/webhooks/stripe')) {
+          req.rawBody = buf;
+        }
+      },
+    }),
+  );
 
   app.setGlobalPrefix('api');
 

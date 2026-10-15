@@ -1,7 +1,6 @@
-import { Controller, Inject, Post, Req, Headers, BadRequestException, Res, InternalServerErrorException } from '@nestjs/common';
+import { Controller, Inject, Post, Req, Headers, BadRequestException, InternalServerErrorException, HttpCode, HttpStatus } from '@nestjs/common';
 import Stripe from 'stripe';
 
-import { Response } from 'express';
 import { OrdersService } from 'src/orders/orders.service';
 import { STRIPE_CLIENT } from './stripe.constants';
 @Controller('webhooks')
@@ -12,12 +11,12 @@ export class StripeController {
         private readonly ordersService:OrdersService    
     ){}
 
-     @Post('stripe')
+    @Post('stripe')
+    @HttpCode(HttpStatus.OK) // <-- Fuerza el código 200 OK de forma nativa para Stripe
     async handleStripeWebhook(
         @Headers('stripe-signature') signature: string,
-        @Req() request: any, 
-        @Res() response: Response
-    ){
+        @Req() request: any, // Captura el request con el buffer crudo
+    ) {
         if (!signature) {
             throw new BadRequestException('Missing stripe signature');
         }
@@ -36,31 +35,30 @@ export class StripeController {
         let event: Stripe.Event;
 
         try {
-           
             event = this.stripe.webhooks.constructEvent(
                 request.rawBody, 
                 signature, 
                 endpointSecret
             );
         } catch (error: any) {
-         
             throw new BadRequestException(`Stripe Webhook signature verification failed: ${error.message}`);    
         }
 
-        
+        // BLOQUE DE LÓGICA DE NEGOCIO SEGURO
         try {
             if (event.type === 'payment_intent.succeeded') {
                 const paymentIntent = event.data.object as Stripe.PaymentIntent;
                 
-             
+                // Aquí se activa tu QueryRunner, transacción ACID y bloqueo pesimista en PostgreSQL
                 await this.ordersService.fulfillOrder(paymentIntent.id);
+                console.log(`[Stripe Webhook] Orden procesada y stock actualizado para el PI: ${paymentIntent.id}`);
             }
             
-          
-            return response.status(200).json({ received: true });
+            // Al quitar @Res(), NestJS capturará este return y le enviará el 200 OK 
+            // a Stripe de forma automática e inmediata para TODOS los eventos.
+            return { received: true };
 
         } catch (error: any) {
-          
             throw new InternalServerErrorException(`Webhook business logic failed: ${error.message}`);
         }
     }
