@@ -61,7 +61,8 @@ export class OrdersService {
                 const priceInCents = Math.round(Number(dbProduct.price) * 100);
                 totalAmountInCents += priceInCents * orderItem.quantity;
                 let newOrderItem = this.orderItemRepository.create({
-                    productName:dbProduct.description,
+                    product:dbProduct,
+                    productName:dbProduct.title,
                     price:dbProduct.price,
                     quantity:orderItem.quantity
                 });
@@ -91,9 +92,10 @@ export class OrdersService {
                     country:shippingAddress.country
                 },
                 items:orderItems,
-                user:user,
-                transactions:[]
+                user:user
             });
+
+            await this.ordersRepository.save(newOrder);
             //Create a stripe payment intent
             const paymentIntent = await this.stripe.paymentIntents.create({
                 amount:totalAmountInCents,
@@ -114,10 +116,11 @@ export class OrdersService {
                 paymentMethodId: typeof paymentIntent.payment_method === 'string' ? paymentIntent.payment_method : null,
                 latestChargeId: typeof paymentIntent.latest_charge === 'string' ? paymentIntent.latest_charge : null,
                 metadata: paymentIntent.metadata || {},
-
+                order:newOrder
             });
-            newOrder.transactions.push(newTransaction);
-            await this.ordersRepository.save(newOrder);
+            await this.transactionRepository.save(newTransaction);
+
+          
             return {
                 orderId:newOrder.id,
                 clientSecret:paymentIntent.client_secret,
@@ -171,7 +174,6 @@ export class OrdersService {
     }
 
     async fulfillOrder(paymentIntentId:string){
-        console.log(paymentIntentId);
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
         await queryRunner.startTransaction();
@@ -179,6 +181,7 @@ export class OrdersService {
             //Check if the order exists 
              const order = await queryRunner.manager.createQueryBuilder(Order,'order')
              .innerJoinAndSelect('order.items','orderItem')
+             .innerJoinAndSelect('orderItem.product', 'product')
              .innerJoin('order.transactions','transaction')
              .select([
                         'order.id',
@@ -186,26 +189,32 @@ export class OrdersService {
                         'order.total',
                         'order.status',
                         'order.shippingAddress',
-                        'order.createdAt'
+                        'order.createdAt',
+                        'orderItem',
+                        'product.id'
             ])
             .where('transaction.stripePaymentIntentId=:paymentIntentId',{paymentIntentId})
             .getOne();
-             if(!order){
+            if(!order){
                 throw new NotFoundException(`The order does not exists`)
              }
-             if(order.status==OrderStatus.PAID){
+             if(order.status===OrderStatus.PAID){
                 //Prevent to process a payment twice
                 await queryRunner.rollbackTransaction();
                 return;
              }
-             //Check the orderItems
+         
              const items:OrderItem[] = order.items;
-             //Validate stock
+             const productIds = items.map(item => item.product.id);
+
+            const dbProducts = await queryRunner.manager.createQueryBuilder(Product, 'product')
+                .setLock('pessimistic_write')
+                .where('product.id IN (:...productIds)', { productIds })
+                .andWhere('product.isActive =:status',{status:true})
+                .getMany();
+        
              for(const item of items){
-                const dbProduct = await queryRunner.manager.findOne(Product,{
-                    where:{ id:item.id },
-                    lock:{mode:'pessimistic_write'}
-                })
+                const dbProduct = dbProducts.find(p => p.id === item.product.id);
                 if(!dbProduct){
                     throw new NotFoundException(`The product ${item.productName} does not exists.`);
                 }
@@ -222,7 +231,7 @@ export class OrdersService {
             await queryRunner.commitTransaction();
 
         } catch (error) {
-             console.error('Error proccesing order, rolling back changes...', error);
+             console.error('Error procesing order, rolling back changes...', error);
             await queryRunner.rollbackTransaction();
             this.handleDBErrors(error);
         }
