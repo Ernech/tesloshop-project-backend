@@ -1,8 +1,25 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsIn, IsInt, IsNumber, IsOptional, 
-         IsPositive, IsString, MinLength 
+import { IsArray, IsEnum, IsIn, IsInt, IsNotEmpty, IsNumber, IsOptional, 
+         IsPositive, IsString, MinLength, 
+         ValidateNested
 } from 'class-validator';
+import { ProductSize } from '../enums/product-size.enum';
+import { Type } from 'class-transformer';
 
+export class ProductSizeDto{
+
+    @ApiProperty({name:'stock',example:5})
+    @IsInt()
+    @IsPositive()
+    stock: number; 
+
+    @ApiProperty({
+        enum:ProductSize,
+        description: 'Product sizes',
+    })
+    @IsEnum(ProductSize,{message: `Size must be one of the following values: ${Object.values(ProductSize).join(', ')}`})
+    size:ProductSize 
+}
 
 export class CreateProductDto {
 
@@ -43,23 +60,14 @@ export class CreateProductDto {
     @IsOptional()
     slug?: string;
 
-    @ApiProperty({
-        example: 10,
-        description: 'Product stock',
-        default: 0
-    })
-    @IsInt()
-    @IsPositive()
-    @IsOptional()
-    stock?: number; 
-
-    @ApiProperty({
-        example: ['M','XL','XXL'],
-        description: 'Product sizes',
-    })
-    @IsString({ each: true })
+  
+ 
+    @ApiProperty({type:[ProductSizeDto], description: 'List of sizes with their corresponding stock levels'})
     @IsArray()
-    sizes: string[]
+    @ValidateNested({ each: true })
+    @Type(() => ProductSizeDto)
+    @IsNotEmpty({ message: 'At least one product stock must be provided' }) 
+    productSizes:ProductSizeDto[]
 
     @ApiProperty({
         example: 'women',
@@ -86,3 +94,4 @@ export class CreateProductDto {
 
 
 }
+

@@ -2,6 +2,7 @@ import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, Index, On
 import { ApiProperty } from '@nestjs/swagger';
 
 import { ProductImage } from './';
+import { ProductSizeStock } from './product-size-stock.entity';
 
 @Entity({ name: 'products' })
 @Index('IDX_product_active_gender', ['isActive', 'gender'])
@@ -56,25 +57,6 @@ export class Product {
     slug: string;
 
     @ApiProperty({
-        example: 10,
-        description: 'Product stock',
-        default: 0
-    })
-    @Column('int', {
-        default: 0
-    })
-    stock: number;
-
-    @ApiProperty({
-        example: ['M','XL','XXL'],
-        description: 'Product sizes',
-    })
-    @Column('text',{
-        array: true
-    })
-    sizes: string[];
-
-    @ApiProperty({
         example: 'women',
         description: 'Product gender',
     })
@@ -111,6 +93,13 @@ export class Product {
         onUpdate:'CURRENT_TIMESTAMP'
     })
     updatedAt: Date;
+
+    @OneToMany(
+        ()=>ProductSizeStock,
+        (productSizeStock)=>productSizeStock.product,
+        {cascade:true}
+    )
+    sizeStocks:ProductSizeStock[];
     // images
     @ApiProperty()
     @OneToMany(

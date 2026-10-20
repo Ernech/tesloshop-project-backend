@@ -16,6 +16,7 @@ import { validate as isUUID } from 'uuid';
 import { ProductImage, Product } from './entities';
 import { ProductPaginationDto } from './dto/product-pagination.dto';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
+import { ProductSizeStock } from './entities/product-size-stock.entity';
 
 @Injectable()
 export class ProductsService {
@@ -28,16 +29,20 @@ export class ProductsService {
     @InjectRepository(ProductImage)
     private readonly productImageRepository: Repository<ProductImage>,
 
+    @InjectRepository(ProductSizeStock)
+    private readonly productSizeStockRepository: Repository<ProductSizeStock>,
+
     private readonly dataSource: DataSource,
     @Inject(CACHE_MANAGER) private cacheManager: Cache
   ) {}
 
   async create(createProductDto: CreateProductDto) {
     try {
-      const { images = [], ...productDetails } = createProductDto;
+      const {productSizes, images = [], ...productDetails } = createProductDto;
 
       const product = this.productRepository.create({
         ...productDetails,
+        sizeStocks:productSizes.map((productSize)=>this.productSizeStockRepository.create(productSize)),
         images: images.map((image) =>
           this.productImageRepository.create({ url: image }),
         ),
@@ -60,6 +65,7 @@ export class ProductsService {
       skip: skip,
       relations: {
         images: true,
+        sizeStocks:true,
       },
       order: {
         id: 'ASC',
@@ -95,6 +101,7 @@ export class ProductsService {
         })
         .andWhere('prod.isActive=:isActive',{isActive:true})
         .leftJoinAndSelect('prod.images', 'prodImages')
+        .innerJoinAndSelect('prod.sizeStocks','sizeStock')
         .getOne();
     }
 
@@ -111,44 +118,74 @@ export class ProductsService {
     };
   }
 
-  async update(id: string, updateProductDto: UpdateProductDto) {
-    const { images, ...toUpdate } = updateProductDto;
+async update(id: string, updateProductDto: UpdateProductDto) {
+    // 1. Extraemos productSizes junto a las imágenes del DTO
+    const { images, productSizes, ...toUpdate } = updateProductDto;
 
+    // El preload cargará las propiedades planas del producto
     const product = await this.productRepository.preload({ id, ...toUpdate });
 
     if (!product)
       throw new NotFoundException(`Product with id: ${id} not found`);
 
-    // Create query runner
+    // Create query runner para el control absoluto de la transacción ACID
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
+      // ==== MANEJO DE IMÁGENES (Lógica original de Teslo Shop) ====
       if (images) {
         await queryRunner.manager.delete(ProductImage, { product: { id } });
-
         product.images = images.map((image) =>
           this.productImageRepository.create({ url: image }),
         );
       }
 
-      // await this.productRepository.save( product );
-      
+      // ==== NUEVO: MANEJO DE STOCK POR TALLAS (Upsert manual controlado) ====
+      if (productSizes) {
+        for (const sizeDto of productSizes) {
+          // Buscamos si el producto ya cuenta con un registro para esta talla específica
+          const existingSizeStock = await queryRunner.manager.findOne(ProductSizeStock, {
+            where: { product: { id }, size: sizeDto.size }
+          });
 
+          if (existingSizeStock) {
+            // Caso A: Si ya existe la combinación Talla + Producto, ACTUALIZAMOS su stock
+            existingSizeStock.stock = sizeDto.stock;
+            await queryRunner.manager.save(existingSizeStock);
+          } else {
+            // Caso B: Si es una nueva talla que el administrador añadió, INSERTAMOS el registro
+            const newSizeStock = queryRunner.manager.create(ProductSizeStock, {
+              size: sizeDto.size,
+              stock: sizeDto.stock,
+              product: { id } // Vinculamos directamente al ID del producto actual
+            });
+            await queryRunner.manager.save(newSizeStock);
+          }
+        }
+      }
+
+      // Guardamos los cambios estructurales del producto (título, precio, imágenes, etc.)
       await queryRunner.manager.save(product);
 
+      // Si todo sale bien, consolidamos cambios y liberamos recursos
       await queryRunner.commitTransaction();
       await queryRunner.release();
+
+      // Invalidamos las cachés correspondientes
       await this.cacheManager.del('/products');
       await this.cacheManager.del(`/products/${id}`); 
+
       return this.findOnePlain(id);
+
     } catch (error) {
+      // Ante cualquier fallo del ciclo, revertimos la base de datos completa
       await queryRunner.rollbackTransaction();
       await queryRunner.release();
       this.handleDBExceptions(error);
     }
-  }
+}
 
   async remove(id: string) {
     try {
