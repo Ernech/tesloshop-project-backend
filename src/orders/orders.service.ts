@@ -14,6 +14,7 @@ import { CurrenciesEnum } from './enums/currencies.enum';
 import { Transaction } from './entities/transaction.entity';
 import { OrderStatus } from './enums/order-status.enum';
 import { STRIPE_CLIENT } from 'src/stripe/stripe.constants';
+import { ProductSizeStock } from 'src/products/entities/product-size-stock.entity';
 
 @Injectable()
 export class OrdersService {
@@ -43,7 +44,16 @@ export class OrdersService {
             }
             //Check products existance
             const productsId = createOrderDto.items.map((item)=>item.productId);
-            const products = await this.productRepository.find({where:{id: In(productsId)}})
+            const products = await this.productRepository.find(
+                {
+                    where:{
+                        id: In(productsId)
+                    },
+                    relations:{
+                        images:true,
+                        sizeStocks:true,
+                    }
+                })
             if(products.length!==createOrderDto.items.length){
                 const foundProductsIds = products.map((product)=>product.id);
                 const nonExistingProductsId = productsId.filter((productsId)=>!foundProductsIds.includes(productsId));
@@ -51,21 +61,53 @@ export class OrdersService {
             }
 
             let totalAmountInCents = 0;
-            const orderItems:OrderItem[]=[];
-            //Check products stock
-            for(const orderItem of createOrderDto.items){
-                const dbProduct = products.find((product)=>product.id===orderItem.productId);
-                if(dbProduct.stock<orderItem.quantity){
-                    throw new BadRequestException(`Insufficient stock for the product: '${dbProduct.description}'. Available: ${dbProduct.stock}, Requested: ${orderItem.quantity}`);
+            const orderItems: OrderItem[] = [];
+
+            // Check products stock
+            for (const orderItem of createOrderDto.items) {
+                const dbProduct = products.find((product) => product.id === orderItem.productId);
+                
+                if (!dbProduct) {
+                    throw new NotFoundException(`Product with ID ${orderItem.productId} not found.`);
                 }
+
+                // 1. Buscar la variante de talla específica
+                const productSizeStock = dbProduct.sizeStocks.find(
+                    (sizeProduct) => sizeProduct.size === orderItem.size
+                );
+
+                // 2. Corregido: Mensaje seguro si la talla no existe en el catálogo
+                if (!productSizeStock) {
+                    const availableSizes = dbProduct.sizeStocks.map(s => s.size).join(', ');
+                    throw new BadRequestException(
+                        `The product '${dbProduct.title}' is not available in size '${orderItem.size}'. Available sizes: [${availableSizes}]`
+                    );
+                }
+
+                // 3. Validar si hay suficientes existencias físicas de esa talla
+                if (productSizeStock.stock < orderItem.quantity) {
+                    throw new BadRequestException(
+                        `Insufficient stock for product '${dbProduct.title}' in size '${orderItem.size}'. Available: ${productSizeStock.stock}, Requested: ${orderItem.quantity}`
+                    );
+                }
+
+                // 4. Acumular el monto en centavos de forma matemática limpia para Stripe
                 const priceInCents = Math.round(Number(dbProduct.price) * 100);
                 totalAmountInCents += priceInCents * orderItem.quantity;
-                let newOrderItem = this.orderItemRepository.create({
-                    product:dbProduct,
-                    productName:dbProduct.title,
-                    price:dbProduct.price,
-                    quantity:orderItem.quantity
+
+                // 5. Instanciar el OrderItem guardando el SNAPSHOT COMPLETO que definimos en la entidad
+                const newOrderItem = this.orderItemRepository.create({
+                    product: dbProduct,
+                    productId: dbProduct.id,             
+                    productName: dbProduct.title,        
+                    price: dbProduct.price,               
+                    quantity: orderItem.quantity,          
+                    selectedSize: orderItem.size,          
+                    selectedGender: dbProduct.gender,      
+                    productImage: dbProduct.images[0]?.url ?? null, 
+                    productSnapshot: dbProduct            
                 });
+
                 orderItems.push(newOrderItem);
             }
 
@@ -204,28 +246,38 @@ export class OrdersService {
                 return;
              }
          
-             const items:OrderItem[] = order.items;
-             const productIds = items.map(item => item.product.id);
-
-            const dbProducts = await queryRunner.manager.createQueryBuilder(Product, 'product')
-                .setLock('pessimistic_write')
-                .where('product.id IN (:...productIds)', { productIds })
-                .andWhere('product.isActive =:status',{status:true})
-                .getMany();
+            const items:OrderItem[] = order.items;
+            const productIds = items.map(item => item.product.id);
+            const selectedSizes = items.map(item => item.selectedSize);
+            const dbSizeStocks = await queryRunner.manager.createQueryBuilder(ProductSizeStock, 'sizeStock')
+            .setLock('pessimistic_write') 
+            .where('sizeStock.product_id IN (:...productIds)', { productIds })
+            .andWhere('sizeStock.size IN (:...selectedSizes)', { selectedSizes })
+            .getMany();
         
-             for(const item of items){
-                const dbProduct = dbProducts.find(p => p.id === item.product.id);
-                if(!dbProduct){
-                    throw new NotFoundException(`The product ${item.productName} does not exists.`);
-                }
-                if(dbProduct.stock<item.quantity){
-                    throw new NotFoundException(`Insuficient stock for the product ${dbProduct.description}. Available ${dbProduct.stock}`)
-                }
-                //Discount stock
-                dbProduct.stock-=item.quantity;
-                await queryRunner.manager.save(Product,dbProduct);
-                //Update order status
+             for (const item of items) {
+            
+            const dbSizeStock = dbSizeStocks.find(
+                s => s.product.id === item.productId && s.size === item.selectedSize
+            );
+
+            if (!dbSizeStock) {
+                throw new BadRequestException(
+                    `La variante para el producto '${item.productName}' en talla '${item.selectedSize}' no se encuentra en el inventario.`
+                );
             }
+
+          
+            if (dbSizeStock.stock < item.quantity) {
+                throw new BadRequestException(
+                    `The variant for the product '${item.productName}' in size '${item.selectedSize}' is not in stock. Available: ${dbSizeStock.stock}, Requested: ${item.quantity}`
+                );
+            }
+
+           
+                dbSizeStock.stock -= item.quantity;
+            }
+            await queryRunner.manager.save(ProductSizeStock, dbSizeStocks);
             order.status=OrderStatus.PAID;
             await queryRunner.manager.save(Order,order)
             await queryRunner.commitTransaction();

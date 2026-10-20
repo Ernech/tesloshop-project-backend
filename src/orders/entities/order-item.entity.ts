@@ -1,6 +1,7 @@
 import { Product } from "src/products/entities";
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn,  } from "typeorm";
 import { Order } from "./order.entity";
+import { ProductSize } from "src/products/enums/product-size.enum";
 
 @Entity('order_item')
 export class OrderItem{
@@ -13,6 +14,25 @@ export class OrderItem{
 
     @Column({name:'quantity'})
     quantity:number;
+
+    @Column({
+        type: 'enum',
+        enum: ProductSize,
+        name: 'selected_size'
+    })
+    selectedSize: ProductSize;
+
+    @Column('varchar', { name: 'selected_gender', length: 20 })
+    selectedGender: string;
+
+    @Column('varchar', { name: 'product_image', nullable: true })
+    productImage: string;
+
+    @Column('jsonb', { name: 'product_snapshot', nullable: true })
+    productSnapshot: Record<string, any>; 
+    
+    @Column('uuid', { name: 'product_id' })
+    productId: string;;
 
     @Column('numeric', {name:'price', precision: 10, scale: 2 }) 
     price: number;

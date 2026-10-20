@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsArray, IsNotEmpty, IsNumber, IsString, IsUUID, Min } from "class-validator";
+import { IsArray, IsEnum, IsNotEmpty, IsNumber, IsString, IsUUID, Min } from "class-validator";
+import { ProductSize } from "src/products/enums/product-size.enum";
 
 
 
@@ -73,6 +74,18 @@ export class CreateOrderItemDto{
     @Min(1,{message:"Quantity must be greater than 1"})
     @ApiProperty({name:"quantity",example:2})
     quantity:number;
+
+    @IsEnum(ProductSize, {
+        message: `Size must be a valid option: ${Object.values(ProductSize).join(', ')}`
+    })
+    @IsNotEmpty({ message: "Size is required" })
+    @ApiProperty({ 
+        name: "size", 
+        enum: ProductSize, 
+        example: ProductSize.M,
+        description: "The selected size for the product" 
+    })
+    size: ProductSize;
 }
 
 export class CreateOrderDto{
