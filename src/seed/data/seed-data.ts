@@ -78,7 +78,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.XL, stock: 3 }
             ],
             price: 75,
-            slug: "mens_chill_crew_neck_sweatshirt",
+            slug: "mens-chill-crew-neck-sweatshirt",
             type: 'shirts',
             tags: ['sweatshirt'],
             title: "Men’s Chill Crew Neck Sweatshirt",
@@ -98,7 +98,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.XL, stock: 9 }
             ],
             price: 200,
-            slug: "men_quilted_shirt_jacket",
+            slug: "men-quilted-shirt-jacket",
             type: 'shirts',
             tags: ['jacket'],
             title: "Men's Quilted Shirt Jacket",
@@ -118,7 +118,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.XL, stock: 9 }
             ],
             price: 130,
-            slug: "men_raven_lightweight_zip_up_bomber_jacket",
+            slug: "men-raven-lightweight-zip-up-bomber-jacket",
             type: 'shirts',
             tags: ['shirt'],
             title: "Men's Raven Lightweight Zip Up Bomber Jacket",
@@ -138,7 +138,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.L,  stock: 9 }
             ],
             price: 45,
-            slug: "men_turbine_long_sleeve_tee",
+            slug: "men-turbine-long-sleeve-tee",
             type: 'shirts',
             tags: ['shirt'],
             title: "Men's Turbine Long Sleeve Tee",
@@ -159,7 +159,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.XXL, stock: 9 }
             ],
             price: 40,
-            slug: "men_turbine_short_sleeve_tee",
+            slug: "men-turbine-short-sleeve-tee",
             type: 'shirts',
             tags: ['shirt'],
             title: "Men's Turbine Short Sleeve Tee",
@@ -180,7 +180,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.XXL, stock: 10 }
             ],
             price: 35,
-            slug: "men_cybertruck_owl_tee",
+            slug: "men-cybertruck-owl-tee",
             type: 'shirts',
             tags: ['shirt'],
             title: "Men's Cybertruck Owl Tee",
@@ -200,7 +200,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.XL, stock: 7 },
             ],
             price: 35,
-            slug: "men_solar_roof_tee",
+            slug: "men-solar-roof-tee",
             type: 'shirts',
             tags: ['shirt'],
             title: "Men's Solar Roof Tee",
@@ -221,7 +221,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.XXL, stock: 8 }
             ],
             price: 35,
-            slug: "men_let_the_sun_shine_tee",
+            slug: "men-let-the-sun-shine-tee",
             type: 'shirts',
             tags: ['shirt'],
             title: "Men's Let the Sun Shine Tee",
@@ -240,7 +240,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.XL, stock: 7 },
             ],
             price: 35,
-            slug: "men_3d_large_wordmark_tee",
+            slug: "men-3d-large-wordmark-tee",
             type: 'shirts',
             tags: ['shirt'],
             title: "Men's 3D Large Wordmark Tee",
@@ -259,7 +259,7 @@ export const initialData: SeedData = {
               
             ],
             price: 35,
-            slug: "men_3d_t_logo_tee",
+            slug: "men-3d-t-logo-tee",
             type: 'shirts',
             tags: ['shirt'],
             title: "Men's 3D T Logo Tee",
@@ -277,7 +277,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.M,  stock: 8 }
             ],
             price: 35,
-            slug: "men_3d_small_wordmark_tee",
+            slug: "men-3d-small-wordmark-tee",
             type: 'shirts',
             tags: ['shirt'],
             title: "Men’s 3D Small Wordmark Tee",
@@ -298,7 +298,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.XXL, stock: 8 }
             ],
             price: 35,
-            slug: "men_plaid_mode_tee",
+            slug: "men-plaid-mode-tee",
             type: 'shirts',
             tags: ['shirt'],
             title: "Men's Plaid Mode Tee",
@@ -316,7 +316,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.XXL, stock: 10 }
             ],
             price: 35,
-            slug: "men_powerwall_tee",
+            slug: "men-powerwall-tee",
             type: 'shirts',
             tags: ['shirt'],
             title: "Men's Powerwall Tee",
@@ -335,7 +335,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.XXL, stock: 8 }
             ],
             price: 30,
-            slug: "men_battery_day_tee",
+            slug: "men-battery-day-tee",
             type: 'shirts',
             tags: ['shirt'],
             title: "Men's Battery Day Tee",
@@ -356,7 +356,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.XXL, stock: 0 }
             ],
             price: 30,
-            slug: "men_cybertruck_bulletproof_tee",
+            slug: "men-cybertruck-bulletproof-tee",
             type: 'shirts',
             tags: ['shirt'],
             title: "Men’s Cybertruck Bulletproof Tee",
@@ -377,7 +377,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.XXL, stock: 9 }
             ],
             price: 35,
-            slug: "men_haha_yes_tee",
+            slug: "men-haha-yes-tee",
             type: 'shirts',
             tags: ['shirt'],
             title: "Men's Haha Yes Tee",
@@ -398,7 +398,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.XXL, stock: 15 }
             ],
             price: 35,
-            slug: "men_s3xy_tee",
+            slug: "men-s3xy-tee",
             type: 'shirts',
             tags: ['shirt'],
             title: "Men's S3XY Tee",
@@ -415,7 +415,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.XXL, stock: 6 }
             ],
             price: 40,
-            slug: "men_3d_wordmark_long_sleeve_tee",
+            slug: "men-3d-wordmark-long-sleeve-tee",
             type: 'shirts',
             tags: ['shirt'],
             title: "Men's 3D Wordmark Long Sleeve Tee",
@@ -432,7 +432,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.XXL, stock: 16 }
             ],
             price: 40,
-            slug: "men_3d_t_logo_long_sleeve_tee",
+            slug: "men-3d-t-logo-long-sleeve-tee",
             type: 'shirts',
             tags: ['shirt'],
             title: "Men's 3D T Logo Long Sleeve Tee",
@@ -453,7 +453,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.XXL, stock: 9 }
             ],
             price: 115,
-            slug: "men_raven_lightweight_hoodie",
+            slug: "men-raven-lightweight-hoodie",
             type: 'hoodies',
             tags: ['hoodie'],
             title: "Men's Raven Lightweight Hoodie",
@@ -474,7 +474,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.XXL, stock: 15 }
             ],
             price: 130,
-            slug: "chill_pullover_hoodie",
+            slug: "chill-pullover-hoodie",
             type: 'hoodies',
             tags: ['hoodie'],
             title: "Chill Pullover Hoodie",
@@ -495,7 +495,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.XXL, stock: 7 }
             ],
             price: 85,
-            slug: "men_chill_full_zip_hoodie",
+            slug: "men-chill-full-zip-hoodie",
             type: 'shirts',
             tags: ['shirt'],
             title: "Men's Chill Full Zip Hoodie",
@@ -514,7 +514,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.L, stock: 0 },
             ],
             price: 85,
-            slug: "men_chill_quarter_zip_pullover_-_gray",
+            slug: "men-chill-quarter-zip-pullover-gray",
             type: 'shirts',
             tags: ['shirt'],
             title: "Men's Chill Quarter Zip Pullover - Gray",
@@ -534,7 +534,7 @@ export const initialData: SeedData = {
               
             ],
             price: 85,
-            slug: "men_chill_quarter_zip_pullover_-_white",
+            slug: "men-chill-quarter-zip-pullover-white",
             type: 'shirts',
             tags: ['shirt'],
             title: "Men's Chill Quarter Zip Pullover - White",
@@ -555,7 +555,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.XXL, stock: 5 }
             ],
             price: 70,
-            slug: "3d_large_wordmark_pullover_hoodie",
+            slug: "3d-large-wordmark-pullover-hoodie",
             type: 'hoodies',
             tags: ['hoodie'],
             title: "3D Large Wordmark Pullover Hoodie",
@@ -576,7 +576,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.XXL, stock: 9 }
             ],
             price: 60,
-            slug: "cybertruck_graffiti_hoodie",
+            slug: "cybertruck-graffiti-hoodie",
             type: 'hoodies',
             tags: ['hoodie'],
             title: "Cybertruck Graffiti Hoodie",
@@ -597,7 +597,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.XXL, stock: 6 }
             ],
             price: 30,
-            slug: "relaxed_t_logo_hat",
+            slug: "relaxed-t-logo-hat",
             type: 'hats',
             tags: ['hats'],
             title: "Relaxed T Logo Hat",
@@ -618,7 +618,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.XXL, stock: 5 }
             ],
             price: 35,
-            slug: "thermal_cuffed_beanie",
+            slug: "thermal-cuffed-beanie",
             type: 'hats',
             tags: ['hats'],
             title: "Thermal Cuffed Beanie",
@@ -638,7 +638,7 @@ export const initialData: SeedData = {
               
             ],
             price: 225,
-            slug: "women_cropped_puffer_jacket",
+            slug: "women-cropped-puffer-jacket",
             type: 'hoodies',
             tags: ['hoodie'],
             title: "Women's Cropped Puffer Jacket",
@@ -657,7 +657,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.XXL, stock: 5 }
             ],
             price: 130,
-            slug: "women_chill_half_zip_cropped_hoodie",
+            slug: "women-chill-half-zip-cropped-hoodie",
             type: 'hoodies',
             tags: ['hoodie'],
             title: "Women's Chill Half Zip Cropped Hoodie",
@@ -678,7 +678,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.XXL, stock: 3 }
             ],
             price: 110,
-            slug: "women_raven_slouchy_crew_sweatshirt",
+            slug: "women-raven-slouchy-crew-sweatshirt",
             type: 'hoodies',
             tags: ['hoodie'],
             title: "Women's Raven Slouchy Crew Sweatshirt",
@@ -699,7 +699,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.XXL, stock: 8 }
             ],
             price: 45,
-            slug: "women_turbine_cropped_long_sleeve_tee",
+            slug: "women-turbine-cropped-long-sleeve-tee",
             type: 'shirts',
             tags: ['shirt'],
             title: "Women's Turbine Cropped Long Sleeve Tee",
@@ -718,7 +718,7 @@ export const initialData: SeedData = {
               
             ],
             price: 40,
-            slug: "women_turbine_cropped_short_sleeve_tee",
+            slug: "women-turbine-cropped-short-sleeve-tee",
             type: 'shirts',
             tags: ['shirt'],
             title: "Women's Turbine Cropped Short Sleeve Tee",
@@ -739,7 +739,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.XXL, stock: 5 }
             ],
             price: 35,
-            slug: "women_t_logo_short_sleeve_scoop_neck_tee",
+            slug: "women-t-logo-short-sleeve-scoop-neck-tee",
             type: 'shirts',
             tags: ['shirt'],
             title: "Women's T Logo Short Sleeve Scoop Neck Tee",
@@ -760,7 +760,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.XXL, stock: 5 }
             ],
             price: 40,
-            slug: "women_t_logo_long_sleeve_scoop_neck_tee",
+            slug: "women-t-logo-long-sleeve-scoop-neck-tee",
             type: 'shirts',
             tags: ['shirt'],
             title: "Women's T Logo Long Sleeve Scoop Neck Tee",
@@ -781,7 +781,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.XXL, stock: 5 }
             ],
             price: 35,
-            slug: "women_small_wordmark_short_sleeve_v-neck_tee",
+            slug: "women-small-wordmark-short-sleeve-v-neck-tee",
             type: 'shirts',
             tags: ['shirt'],
             title: "Women's Small Wordmark Short Sleeve V-Neck Tee",
@@ -798,7 +798,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.XXL, stock: 5 }
             ],
             price: 35,
-            slug: "women_large_wordmark_short_sleeve_crew_neck_tee",
+            slug: "women-large-wordmark-short-sleeve-crew-neck-tee",
             type: 'shirts',
             tags: ['shirt'],
             title: "Women's Large Wordmark Short Sleeve Crew Neck Tee",
@@ -816,7 +816,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.L,  stock: 0 }, 
             ],
             price: 35,
-            slug: "women_plaid_mode_tee",
+            slug: "women-plaid-mode-tee",
             type: 'shirts',
             tags: ['shirt'],
             title: "Women's Plaid Mode Tee",
@@ -837,7 +837,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.XXL, stock: 5 }
             ],
             price: 130,
-            slug: "women_powerwall_tee",
+            slug: "women-powerwall-tee",
             type: 'shirts',
             tags: ['shirt'],
             title: "Women’s Powerwall Tee",
@@ -856,7 +856,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.XXL, stock: 5 }
             ],
             price: 90,
-            slug: "women_corp_jacket",
+            slug: "women-corp-jacket",
             type: 'shirts',
             tags: ['shirt'],
             title: "Women's Corp Jacket",
@@ -877,7 +877,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.XXL, stock: 9 }
             ],
             price: 100,
-            slug: "women_raven_joggers",
+            slug: "women-raven-joggers",
             type: 'shirts',
             tags: ['shirt'],
             title: "Women's Raven Joggers",
@@ -896,7 +896,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.L,  stock: 0 }
             ],
             price: 30,
-            slug: "kids_cybertruck_long_sleeve_tee",
+            slug: "kids-cybertruck-long-sleeve-tee",
             type: 'shirts',
             tags: ['shirt'],
             title: "Kids Cybertruck Long Sleeve Tee",
@@ -914,7 +914,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.M,  stock: 7 },
             ],
             price: 25,
-            slug: "kids_scribble_t_logo_tee",
+            slug: "kids-scribble-t-logo-tee",
             type: 'shirts',
             tags: ['shirt'],
             title: "Kids Scribble T Logo Tee",
@@ -932,7 +932,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.M,  stock: 8 },
             ],
             price: 25,
-            slug: "kids_cybertruck_tee",
+            slug: "kids-cybertruck-tee",
             type: 'shirts',
             tags: ['shirt'],
             title: "Kids Cybertruck Tee",
@@ -950,7 +950,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.M,  stock: 6 },
             ],
             price: 30,
-            slug: "kids_racing_stripe_tee",
+            slug: "kids-racing-stripe-tee",
             type: 'shirts',
             tags: ['shirt'],
             title: "Kids Racing Stripe Tee",
@@ -968,7 +968,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.M,  stock: 6 },
             ],
             price: 30,
-            slug: "kids_3d_t_logo_tee",
+            slug: "kids-3d-t-logo-tee",
             type: 'shirts',
             tags: ['shirt'],
             title: "Kids 3D T Logo Tee",
@@ -986,7 +986,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.M,  stock: 8 },
             ],
             price: 30,
-            slug: "kids_checkered_tee",
+            slug: "kids-checkered-tee",
             type: 'shirts',
             tags: ['shirt'],
             title: "Kids Checkered Tee",
@@ -1003,7 +1003,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.S,  stock: 9 }
             ],
             price: 25,
-            slug: "made_on_earth_by_humans_onesie",
+            slug: "made-on-earth-by-humans-onesie",
             type: 'shirts',
             tags: ['shirt'],
             title: "Made on Earth by Humans Onesie",
@@ -1020,7 +1020,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.S,  stock: 0 }
             ],
             price: 30,
-            slug: "scribble_t_logo_onesie",
+            slug: "scribble-t-logo-onesie",
             type: 'shirts',
             tags: ['shirt'],
             title: "Scribble T Logo Onesie",
@@ -1038,7 +1038,7 @@ export const initialData: SeedData = {
               
             ],
             price: 30,
-            slug: "zero_emissions_(almost)_onesie",
+            slug: "zero-emissions-(almost)-onesie",
             type: 'shirts',
             tags: ['shirt'],
             title: "Zero Emissions (Almost) Onesie",
@@ -1056,7 +1056,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.M,  stock: 6 },
             ],
             price: 65,
-            slug: "kids_cyberquad_bomber_jacket",
+            slug: "kids-cyberquad-bomber-jacket",
             type: 'shirts',
             tags: ['shirt'],
             title: "Kids Cyberquad Bomber Jacket",
@@ -1074,7 +1074,7 @@ export const initialData: SeedData = {
                 { size: ProductSize.M,  stock: 6 },
             ],
             price: 30,
-            slug: "kids_corp_jacket",
+            slug: "kids-corp-jacket",
             type: 'shirts',
             tags: ['shirt'],
             title: "Kids Corp Jacket",
