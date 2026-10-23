@@ -1,19 +1,25 @@
 import * as bcrypt from 'bcrypt';
+import { ProductSize } from 'src/products/enums/product-size.enum';
+
+interface SeedProductSizeStock {
+    size: ProductSize;
+    stock: number;
+}
+
 
 interface SeedProduct {
     description: string;
     images: string[];
-    stock: number;
     price: number;
-    sizes: ValidSizes[];
+    productSizes: SeedProductSizeStock[]; 
     slug: string;
     tags: string[];
     title: string;
     type: ValidTypes;
-    gender: 'men'|'women'|'kid'|'unisex'
+    gender: 'men' | 'women' | 'kid' | 'unisex';
 }
 
-type ValidSizes = 'XS'|'S'|'M'|'L'|'XL'|'XXL'|'XXXL';
+
 type ValidTypes = 'shirts'|'pants'|'hoodies'|'hats';
 
 interface SeedUser {
@@ -64,9 +70,14 @@ export const initialData: SeedData = {
                 '1740176-00-A_0_2000.jpg',
                 '1740176-00-A_1.jpg',
             ],
-            stock: 7,
+           productSizes: [
+                { size: ProductSize.XS, stock: 5 },
+                { size: ProductSize.S,  stock: 10 },
+                { size: ProductSize.M,  stock: 8 },
+                { size: ProductSize.L,  stock: 0 }, // Talla sin stock listo para probar en Angular
+                { size: ProductSize.XL, stock: 3 }
+            ],
             price: 75,
-            sizes: ['XS','S','M','L','XL','XXL'],
             slug: "mens_chill_crew_neck_sweatshirt",
             type: 'shirts',
             tags: ['sweatshirt'],
@@ -79,9 +90,14 @@ export const initialData: SeedData = {
                 '1740507-00-A_0_2000.jpg',
                 '1740507-00-A_1.jpg',
             ],
-            stock: 5,
+            productSizes: [
+                { size: ProductSize.XS, stock: 8 },
+                { size: ProductSize.S,  stock: 11 },
+                { size: ProductSize.M,  stock: 6 },
+                { size: ProductSize.L,  stock: 0 }, // Talla sin stock listo para probar en Angular
+                { size: ProductSize.XL, stock: 9 }
+            ],
             price: 200,
-            sizes: ['XS','S','M','XL','XXL'],
             slug: "men_quilted_shirt_jacket",
             type: 'shirts',
             tags: ['jacket'],
@@ -95,9 +111,13 @@ export const initialData: SeedData = {
                 '1740250-00-A_0_2000.jpg',
                 '1740250-00-A_1.jpg'
             ],
-            stock: 10,
+            productSizes: [
+                { size: ProductSize.S,  stock: 11 },
+                { size: ProductSize.M,  stock: 6 },
+                { size: ProductSize.L,  stock: 7 }, // Talla sin stock listo para probar en Angular
+                { size: ProductSize.XL, stock: 9 }
+            ],
             price: 130,
-            sizes: ['S','M','L','XL','XXL'],
             slug: "men_raven_lightweight_zip_up_bomber_jacket",
             type: 'shirts',
             tags: ['shirt'],
@@ -111,9 +131,13 @@ export const initialData: SeedData = {
                 '1740280-00-A_0_2000.jpg',
                 '1740280-00-A_1.jpg',
             ],
-            stock: 50,
+            productSizes: [
+                { size: ProductSize.XS, stock: 6 },
+                { size: ProductSize.S,  stock: 10 },
+                { size: ProductSize.M,  stock: 7 },
+                { size: ProductSize.L,  stock: 9 }
+            ],
             price: 45,
-            sizes: ['XS','S','M','L'],
             slug: "men_turbine_long_sleeve_tee",
             type: 'shirts',
             tags: ['shirt'],
@@ -126,9 +150,15 @@ export const initialData: SeedData = {
                 '1741416-00-A_0_2000.jpg',
                 '1741416-00-A_1.jpg',
             ],
-            stock: 50,
+            productSizes: [
+                { size: ProductSize.XS, stock: 0 },
+                { size: ProductSize.S,  stock: 10 },
+                { size: ProductSize.M,  stock: 8 },
+                { size: ProductSize.L,  stock: 0 }, // Talla sin stock listo para probar en Angular
+                { size: ProductSize.XL, stock: 7 },
+                { size: ProductSize.XXL, stock: 9 }
+            ],
             price: 40,
-            sizes: ['M','L','XL','XXL'],
             slug: "men_turbine_short_sleeve_tee",
             type: 'shirts',
             tags: ['shirt'],
@@ -141,9 +171,15 @@ export const initialData: SeedData = {
                 '7654393-00-A_2_2000.jpg',
                 '7654393-00-A_3.jpg',
             ],
-            stock: 0,
+            productSizes: [
+                { size: ProductSize.XS, stock: 0 },
+                { size: ProductSize.S,  stock: 0 },
+                { size: ProductSize.M,  stock: 6 },
+                { size: ProductSize.L,  stock: 8 },
+                { size: ProductSize.XL, stock: 7 },
+                { size: ProductSize.XXL, stock: 10 }
+            ],
             price: 35,
-            sizes: ['M','L','XL','XXL'],
             slug: "men_cybertruck_owl_tee",
             type: 'shirts',
             tags: ['shirt'],
@@ -156,9 +192,14 @@ export const initialData: SeedData = {
                 '1703767-00-A_0_2000.jpg',
                 '1703767-00-A_1.jpg',
             ],
-            stock: 15,
+            productSizes: [
+                { size: ProductSize.XS, stock: 0 },
+                { size: ProductSize.S,  stock: 11 },
+                { size: ProductSize.M,  stock: 8 },
+                { size: ProductSize.L,  stock: 0 }, 
+                { size: ProductSize.XL, stock: 7 },
+            ],
             price: 35,
-            sizes: ['S','M','L','XL'],
             slug: "men_solar_roof_tee",
             type: 'shirts',
             tags: ['shirt'],
@@ -171,9 +212,15 @@ export const initialData: SeedData = {
                 '1700280-00-A_0_2000.jpg',
                 '1700280-00-A_1.jpg',
             ],
-            stock: 17,
+            productSizes: [
+                { size: ProductSize.XS, stock: 9 },
+                { size: ProductSize.S,  stock: 10 },
+                { size: ProductSize.M,  stock: 0 },
+                { size: ProductSize.L,  stock: 0 },
+                { size: ProductSize.XL, stock: 7 },
+                { size: ProductSize.XXL, stock: 8 }
+            ],
             price: 35,
-            sizes: ['XS','S','XL','XXL'],
             slug: "men_let_the_sun_shine_tee",
             type: 'shirts',
             tags: ['shirt'],
@@ -186,9 +233,13 @@ export const initialData: SeedData = {
                 '8764734-00-A_0_2000.jpg',
                 '8764734-00-A_1.jpg',
             ],
-            stock: 12,
+            productSizes: [
+                { size: ProductSize.XS, stock: 0 },
+                { size: ProductSize.S,  stock: 10 },
+                { size: ProductSize.M, stock: 9 },
+                { size: ProductSize.XL, stock: 7 },
+            ],
             price: 35,
-            sizes: ['XS','S','M'],
             slug: "men_3d_large_wordmark_tee",
             type: 'shirts',
             tags: ['shirt'],
@@ -201,9 +252,13 @@ export const initialData: SeedData = {
                 '7652426-00-A_0_2000.jpg',
                 '7652426-00-A_1.jpg',
             ],
-            stock: 5,
+            productSizes: [
+                { size: ProductSize.XS, stock: 9 },
+                { size: ProductSize.S,  stock: 5 },
+                { size: ProductSize.M,  stock: 0 },
+              
+            ],
             price: 35,
-            sizes: ['XS','S'],
             slug: "men_3d_t_logo_tee",
             type: 'shirts',
             tags: ['shirt'],
@@ -216,9 +271,12 @@ export const initialData: SeedData = {
                 '8528839-00-A_0_2000.jpg',
                 '8528839-00-A_2.jpg',
             ],
-            stock: 2,
+            productSizes: [
+                { size: ProductSize.XS, stock: 4 },
+                { size: ProductSize.S,  stock: 5 },
+                { size: ProductSize.M,  stock: 8 }
+            ],
             price: 35,
-            sizes: ['XS','S','M'],
             slug: "men_3d_small_wordmark_tee",
             type: 'shirts',
             tags: ['shirt'],
@@ -231,9 +289,15 @@ export const initialData: SeedData = {
                 '1549268-00-A_0_2000.jpg',
                 '1549268-00-A_2.jpg',
             ],
-            stock: 82,
+            productSizes: [
+                { size: ProductSize.XS, stock: 10 },
+                { size: ProductSize.S,  stock: 9 },
+                { size: ProductSize.M,  stock: 8 },
+                { size: ProductSize.L,  stock: 11 }, // Talla sin stock listo para probar en Angular
+                { size: ProductSize.XL, stock: 6 },
+                { size: ProductSize.XXL, stock: 8 }
+            ],
             price: 35,
-            sizes: ['XS','S','M','L','XL','XXL'],
             slug: "men_plaid_mode_tee",
             type: 'shirts',
             tags: ['shirt'],
@@ -246,9 +310,12 @@ export const initialData: SeedData = {
                 '9877034-00-A_0_2000.jpg',
                 '9877034-00-A_2.jpg',
             ],
-            stock: 24,
+            productSizes: [ 
+                { size: ProductSize.L,  stock: 0 }, 
+                { size: ProductSize.XL, stock: 8 },
+                { size: ProductSize.XXL, stock: 10 }
+            ],
             price: 35,
-            sizes: ['XL','XXL'],
             slug: "men_powerwall_tee",
             type: 'shirts',
             tags: ['shirt'],
@@ -261,9 +328,13 @@ export const initialData: SeedData = {
                 '1633802-00-A_0_2000.jpg',
                 '1633802-00-A_2.jpg',
             ],
-            stock: 5,
+            productSizes: [
+                { size: ProductSize.XS, stock: 10 },
+                { size: ProductSize.S,  stock: 0 },
+                { size: ProductSize.XL, stock: 6 },
+                { size: ProductSize.XXL, stock: 8 }
+            ],
             price: 30,
-            sizes: ['XS','S','XXL'],
             slug: "men_battery_day_tee",
             type: 'shirts',
             tags: ['shirt'],
@@ -276,9 +347,15 @@ export const initialData: SeedData = {
                 '7654399-00-A_0_2000.jpg',
                 '7654399-00-A_1.jpg',
             ],
-            stock: 150,
+            productSizes: [
+                { size: ProductSize.XS, stock: 0 },
+                { size: ProductSize.S,  stock: 5 },
+                { size: ProductSize.M,  stock: 7 },
+                { size: ProductSize.L,  stock: 3 }, 
+                { size: ProductSize.XL, stock: 4 },
+                { size: ProductSize.XXL, stock: 0 }
+            ],
             price: 30,
-            sizes: ['M','L'],
             slug: "men_cybertruck_bulletproof_tee",
             type: 'shirts',
             tags: ['shirt'],
@@ -291,9 +368,15 @@ export const initialData: SeedData = {
                 '7652410-00-A_0.jpg',
                 '7652410-00-A_1_2000.jpg',
             ],
-            stock: 10,
+            productSizes: [
+                { size: ProductSize.XS, stock: 10 },
+                { size: ProductSize.S,  stock: 9 },
+                { size: ProductSize.M,  stock: 8 },
+                { size: ProductSize.L,  stock: 12 }, 
+                { size: ProductSize.XL, stock: 7 },
+                { size: ProductSize.XXL, stock: 9 }
+            ],
             price: 35,
-            sizes: ['XS','S','M','L','XL','XXL'],
             slug: "men_haha_yes_tee",
             type: 'shirts',
             tags: ['shirt'],
@@ -306,9 +389,15 @@ export const initialData: SeedData = {
                 '8764600-00-A_0_2000.jpg',
                 '8764600-00-A_2.jpg',
             ],
-            stock: 34,
+            productSizes: [
+                { size: ProductSize.XS, stock: 12 },
+                { size: ProductSize.S,  stock: 13 },
+                { size: ProductSize.M,  stock: 10 },
+                { size: ProductSize.L,  stock: 12 }, 
+                { size: ProductSize.XL, stock: 11 },
+                { size: ProductSize.XXL, stock: 15 }
+            ],
             price: 35,
-            sizes: ['XS','S','M','L'],
             slug: "men_s3xy_tee",
             type: 'shirts',
             tags: ['shirt'],
@@ -321,9 +410,11 @@ export const initialData: SeedData = {
                 '8764813-00-A_0_2000.jpg',
                 '8764813-00-A_1.jpg',
             ],
-            stock: 15,
+            productSizes: [
+                { size: ProductSize.XL, stock: 8 },
+                { size: ProductSize.XXL, stock: 6 }
+            ],
             price: 40,
-            sizes: ['XL','XXL'],
             slug: "men_3d_wordmark_long_sleeve_tee",
             type: 'shirts',
             tags: ['shirt'],
@@ -336,9 +427,11 @@ export const initialData: SeedData = {
                 '8529198-00-A_0_2000.jpg',
                 '8529198-00-A_1.jpg',
             ],
-            stock: 12,
+            productSizes: [
+                { size: ProductSize.XS, stock: 12 },
+                { size: ProductSize.XXL, stock: 16 }
+            ],
             price: 40,
-            sizes: ['XS','XXL'],
             slug: "men_3d_t_logo_long_sleeve_tee",
             type: 'shirts',
             tags: ['shirt'],
@@ -351,9 +444,15 @@ export const initialData: SeedData = {
                 '1740245-00-A_0_2000.jpg',
                 '1740245-00-A_1.jpg',
             ],
-            stock: 10,
+            productSizes: [
+                { size: ProductSize.XS, stock: 10 },
+                { size: ProductSize.S,  stock: 9 },
+                { size: ProductSize.M,  stock: 0 },
+                { size: ProductSize.L,  stock: 5 }, 
+                { size: ProductSize.XL, stock: 8 },
+                { size: ProductSize.XXL, stock: 9 }
+            ],
             price: 115,
-            sizes: ['XS','S','M','L','XL','XXL'],
             slug: "men_raven_lightweight_hoodie",
             type: 'hoodies',
             tags: ['hoodie'],
@@ -366,9 +465,15 @@ export const initialData: SeedData = {
                 '1740051-00-A_0_2000.jpg',
                 '1740051-00-A_1.jpg',
             ],
-            stock: 10,
+            productSizes: [
+                { size: ProductSize.XS, stock: 12 },
+                { size: ProductSize.S,  stock: 13 },
+                { size: ProductSize.M,  stock: 10 },
+                { size: ProductSize.L,  stock: 12 }, 
+                { size: ProductSize.XL, stock: 11 },
+                { size: ProductSize.XXL, stock: 15 }
+            ],
             price: 130,
-            sizes: ['XS','S','M','L','XL','XXL'],
             slug: "chill_pullover_hoodie",
             type: 'hoodies',
             tags: ['hoodie'],
@@ -381,9 +486,15 @@ export const initialData: SeedData = {
                 '1741111-00-A_0_2000.jpg',
                 '1741111-00-A_1.jpg',
             ],
-            stock: 100,
+            productSizes: [
+                { size: ProductSize.XS, stock: 5 },
+                { size: ProductSize.S,  stock: 3 },
+                { size: ProductSize.M,  stock: 0 },
+                { size: ProductSize.L,  stock: 8 }, 
+                { size: ProductSize.XL, stock: 2 },
+                { size: ProductSize.XXL, stock: 7 }
+            ],
             price: 85,
-            sizes: ['XS','L','XL','XXL'],
             slug: "men_chill_full_zip_hoodie",
             type: 'shirts',
             tags: ['shirt'],
@@ -396,9 +507,13 @@ export const initialData: SeedData = {
                 '1740140-00-A_0_2000.jpg',
                 '1740140-00-A_1.jpg',
             ],
-            stock: 7,
+              productSizes: [
+                { size: ProductSize.XS, stock: 7 },
+                { size: ProductSize.S,  stock: 9 },
+                { size: ProductSize.M,  stock: 5 }, 
+                { size: ProductSize.L, stock: 0 },
+            ],
             price: 85,
-            sizes: ['XS','S','M'],
             slug: "men_chill_quarter_zip_pullover_-_gray",
             type: 'shirts',
             tags: ['shirt'],
@@ -411,9 +526,14 @@ export const initialData: SeedData = {
                 '1740145-00-A_2_2000.jpg',
                 '1740145-00-A_1.jpg',
             ],
-            stock: 15,
+            productSizes: [
+                { size: ProductSize.XS, stock: 6 },
+                { size: ProductSize.S,  stock: 9 },
+                { size: ProductSize.M,  stock: 7 },
+                { size: ProductSize.L,  stock: 8 }, 
+              
+            ],
             price: 85,
-            sizes: ['XS','S','M','L'],
             slug: "men_chill_quarter_zip_pullover_-_white",
             type: 'shirts',
             tags: ['shirt'],
@@ -426,9 +546,15 @@ export const initialData: SeedData = {
                 '8529107-00-A_0_2000.jpg',
                 '8529107-00-A_1.jpg',
             ],
-            stock: 15,
+            productSizes: [
+                { size: ProductSize.XS, stock: 5 },
+                { size: ProductSize.S,  stock: 3 },
+                { size: ProductSize.M,  stock: 0 },
+                { size: ProductSize.L,  stock: 0 }, 
+                { size: ProductSize.XL, stock: 1 },
+                { size: ProductSize.XXL, stock: 5 }
+            ],
             price: 70,
-            sizes: ['XS','S','XL','XXL'],
             slug: "3d_large_wordmark_pullover_hoodie",
             type: 'hoodies',
             tags: ['hoodie'],
@@ -441,9 +567,15 @@ export const initialData: SeedData = {
                 '7654420-00-A_0_2000.jpg',
                 '7654420-00-A_1_2000.jpg',
             ],
-            stock: 13,
+            productSizes: [
+                { size: ProductSize.XS, stock: 15 },
+                { size: ProductSize.S,  stock: 12 },
+                { size: ProductSize.M,  stock: 8 },
+                { size: ProductSize.L,  stock: 6 }, 
+                { size: ProductSize.XL, stock: 7 },
+                { size: ProductSize.XXL, stock: 9 }
+            ],
             price: 60,
-            sizes: ['XS','S','M','L','XL','XXL'],
             slug: "cybertruck_graffiti_hoodie",
             type: 'hoodies',
             tags: ['hoodie'],
@@ -456,9 +588,15 @@ export const initialData: SeedData = {
                 '1657932-00-A_0_2000.jpg',
                 '1657932-00-A_1.jpg',
             ],
-            stock: 11,
+            productSizes: [
+                { size: ProductSize.XS, stock: 12 },
+                { size: ProductSize.S,  stock: 6 },
+                { size: ProductSize.M,  stock: 9 },
+                { size: ProductSize.L,  stock: 8 }, 
+                { size: ProductSize.XL, stock: 7 },
+                { size: ProductSize.XXL, stock: 6 }
+            ],
             price: 30,
-            sizes: ['XS','S','M','L','XL','XXL'],
             slug: "relaxed_t_logo_hat",
             type: 'hats',
             tags: ['hats'],
@@ -471,9 +609,15 @@ export const initialData: SeedData = {
                 '1740417-00-A_0_2000.jpg',
                 '1740417-00-A_1.jpg',
             ],
-            stock: 13,
+            productSizes: [
+                { size: ProductSize.XS, stock: 5 },
+                { size: ProductSize.S,  stock: 8 },
+                { size: ProductSize.M,  stock: 6 },
+                { size: ProductSize.L,  stock: 2 }, 
+                { size: ProductSize.XL, stock: 1 },
+                { size: ProductSize.XXL, stock: 5 }
+            ],
             price: 35,
-            sizes: ['XS','S','M','L','XL','XXL'],
             slug: "thermal_cuffed_beanie",
             type: 'hats',
             tags: ['hats'],
@@ -486,9 +630,14 @@ export const initialData: SeedData = {
                 '1740535-00-A_0_2000.jpg',
                 '1740535-00-A_1.jpg',
             ],
-            stock: 85,
+            productSizes: [
+                { size: ProductSize.XS, stock: 9 },
+                { size: ProductSize.S,  stock: 5 },
+                { size: ProductSize.M,  stock: 12 },
+                { size: ProductSize.L,  stock: 0 }, 
+              
+            ],
             price: 225,
-            sizes: ['XS','S','M'],
             slug: "women_cropped_puffer_jacket",
             type: 'hoodies',
             tags: ['hoodie'],
@@ -501,9 +650,13 @@ export const initialData: SeedData = {
                 '1740226-00-A_0_2000.jpg',
                 '1740226-00-A_1.jpg',
             ],
-            stock: 10,
+            productSizes: [
+                { size: ProductSize.XS, stock: 2 },
+                { size: ProductSize.S,  stock: 3 },
+                { size: ProductSize.XL, stock: 4 },
+                { size: ProductSize.XXL, stock: 5 }
+            ],
             price: 130,
-            sizes: ['XS','S','M','XXL'],
             slug: "women_chill_half_zip_cropped_hoodie",
             type: 'hoodies',
             tags: ['hoodie'],
@@ -516,9 +669,15 @@ export const initialData: SeedData = {
                 '1740260-00-A_0_2000.jpg',
                 '1740260-00-A_1.jpg',
             ],
-            stock: 9,
+            productSizes: [
+                { size: ProductSize.XS, stock: 8 },
+                { size: ProductSize.S,  stock: 7 },
+                { size: ProductSize.M,  stock: 6 },
+                { size: ProductSize.L,  stock: 7 }, 
+                { size: ProductSize.XL, stock: 6 },
+                { size: ProductSize.XXL, stock: 3 }
+            ],
             price: 110,
-            sizes: ['XS','S','M','L','XL','XXL'],
             slug: "women_raven_slouchy_crew_sweatshirt",
             type: 'hoodies',
             tags: ['hoodie'],
@@ -531,9 +690,15 @@ export const initialData: SeedData = {
                 '1740290-00-A_0_2000.jpg',
                 '1740290-00-A_1.jpg',
             ],
-            stock: 10,
+            productSizes: [
+                { size: ProductSize.XS, stock: 8 },
+                { size: ProductSize.S,  stock: 4 },
+                { size: ProductSize.M,  stock: 6 },
+                { size: ProductSize.L,  stock: 9 }, 
+                { size: ProductSize.XL, stock: 4 },
+                { size: ProductSize.XXL, stock: 8 }
+            ],
             price: 45,
-            sizes: ['XS','S','M','L','XL','XXL'],
             slug: "women_turbine_cropped_long_sleeve_tee",
             type: 'shirts',
             tags: ['shirt'],
@@ -546,9 +711,13 @@ export const initialData: SeedData = {
                 '1741441-00-A_0_2000.jpg',
                 '1741441-00-A_1.jpg',
             ],
-            stock: 0,
+            productSizes: [
+                { size: ProductSize.XS, stock: 9 },
+                { size: ProductSize.S,  stock: 5 },
+                { size: ProductSize.M,  stock: 0 },
+              
+            ],
             price: 40,
-            sizes: ['XS','S'],
             slug: "women_turbine_cropped_short_sleeve_tee",
             type: 'shirts',
             tags: ['shirt'],
@@ -561,9 +730,15 @@ export const initialData: SeedData = {
                 '8765090-00-A_0_2000.jpg',
                 '8765090-00-A_1.jpg',
             ],
-            stock: 30,
+            productSizes: [
+                { size: ProductSize.XS, stock: 7 },
+                { size: ProductSize.S,  stock: 8 },
+                { size: ProductSize.M,  stock: 9 },
+                { size: ProductSize.L,  stock: 2 }, 
+                { size: ProductSize.XL, stock: 7 },
+                { size: ProductSize.XXL, stock: 5 }
+            ],
             price: 35,
-            sizes: ['XS','S','M','L','XL','XXL'],
             slug: "women_t_logo_short_sleeve_scoop_neck_tee",
             type: 'shirts',
             tags: ['shirt'],
@@ -576,9 +751,15 @@ export const initialData: SeedData = {
                 '8765100-00-A_0_2000.jpg',
                 '8765100-00-A_1.jpg',
             ],
-            stock: 16,
+            productSizes: [
+                { size: ProductSize.XS, stock: 8 },
+                { size: ProductSize.S,  stock: 4 },
+                { size: ProductSize.M,  stock: 0 },
+                { size: ProductSize.L,  stock: 2 }, 
+                { size: ProductSize.XL, stock: 9 },
+                { size: ProductSize.XXL, stock: 5 }
+            ],
             price: 40,
-            sizes: ['XS','S','L','XL','XXL'],
             slug: "women_t_logo_long_sleeve_scoop_neck_tee",
             type: 'shirts',
             tags: ['shirt'],
@@ -591,9 +772,15 @@ export const initialData: SeedData = {
                 '8765120-00-A_0_2000.jpg',
                 '8765120-00-A_1.jpg',
             ],
-            stock: 18,
+            productSizes: [
+                { size: ProductSize.XS, stock: 9 },
+                { size: ProductSize.S,  stock: 5 },
+                { size: ProductSize.M,  stock: 7 },
+                { size: ProductSize.L,  stock: 6 }, 
+                { size: ProductSize.XL, stock: 3 },
+                { size: ProductSize.XXL, stock: 5 }
+            ],
             price: 35,
-            sizes: ['XS','S','M','L','XL','XXL'],
             slug: "women_small_wordmark_short_sleeve_v-neck_tee",
             type: 'shirts',
             tags: ['shirt'],
@@ -606,9 +793,11 @@ export const initialData: SeedData = {
                 '8765115-00-A_0_2000.jpg',
                 '8765115-00-A_1.jpg',
             ],
-            stock: 5,
+            productSizes: [
+                { size: ProductSize.XL, stock: 8 },
+                { size: ProductSize.XXL, stock: 5 }
+            ],
             price: 35,
-            sizes: ['XL','XXL'],
             slug: "women_large_wordmark_short_sleeve_crew_neck_tee",
             type: 'shirts',
             tags: ['shirt'],
@@ -621,9 +810,12 @@ export const initialData: SeedData = {
                 '1549275-00-A_0_2000.jpg',
                 '1549275-00-A_1.jpg',
             ],
-            stock: 16,
+            productSizes: [
+                { size: ProductSize.S,  stock: 6 },
+                { size: ProductSize.M,  stock: 5 },
+                { size: ProductSize.L,  stock: 0 }, 
+            ],
             price: 35,
-            sizes: ['S','M'],
             slug: "women_plaid_mode_tee",
             type: 'shirts',
             tags: ['shirt'],
@@ -636,9 +828,15 @@ export const initialData: SeedData = {
                 '9877040-00-A_0_2000.jpg',
                 '9877040-00-A_1.jpg',
             ],
-            stock: 10,
+            productSizes: [
+                { size: ProductSize.XS, stock: 8 },
+                { size: ProductSize.S,  stock: 7 },
+                { size: ProductSize.M,  stock: 6 },
+                { size: ProductSize.L,  stock: 2 }, 
+                { size: ProductSize.XL, stock: 7 },
+                { size: ProductSize.XXL, stock: 5 }
+            ],
             price: 130,
-            sizes: ['XS','S','M','L','XL','XXL'],
             slug: "women_powerwall_tee",
             type: 'shirts',
             tags: ['shirt'],
@@ -651,9 +849,13 @@ export const initialData: SeedData = {
                 '5645680-00-A_0_2000.jpg',
                 '5645680-00-A_3.jpg',
             ],
-            stock: 3,
+            productSizes: [
+                { size: ProductSize.M,  stock: 7 },
+                { size: ProductSize.L,  stock: 7 }, 
+                { size: ProductSize.XL, stock: 8 },
+                { size: ProductSize.XXL, stock: 5 }
+            ],
             price: 90,
-            sizes: ['M','L','XL','XXL'],
             slug: "women_corp_jacket",
             type: 'shirts',
             tags: ['shirt'],
@@ -666,9 +868,15 @@ export const initialData: SeedData = {
                 '1740270-00-A_0_2000.jpg',
                 '1740270-00-A_1.jpg',
             ],
-            stock: 162,
+            productSizes: [
+                { size: ProductSize.XS, stock: 8 },
+                { size: ProductSize.S,  stock: 5 },
+                { size: ProductSize.M,  stock: 6 },
+                { size: ProductSize.L,  stock: 8 }, 
+                { size: ProductSize.XL, stock: 2 },
+                { size: ProductSize.XXL, stock: 9 }
+            ],
             price: 100,
-            sizes: ['XS','S','M','L','XL','XXL'],
             slug: "women_raven_joggers",
             type: 'shirts',
             tags: ['shirt'],
@@ -681,9 +889,13 @@ export const initialData: SeedData = {
                 '1742694-00-A_1_2000.jpg',
                 '1742694-00-A_3.jpg',
             ],
-            stock: 10,
+            productSizes: [
+                { size: ProductSize.XS, stock: 6 },
+                { size: ProductSize.S,  stock: 8 },
+                { size: ProductSize.M,  stock: 5 },
+                { size: ProductSize.L,  stock: 0 }
+            ],
             price: 30,
-            sizes: ['XS','S','M'],
             slug: "kids_cybertruck_long_sleeve_tee",
             type: 'shirts',
             tags: ['shirt'],
@@ -696,9 +908,12 @@ export const initialData: SeedData = {
                 '8529312-00-A_0_2000.jpg',
                 '8529312-00-A_1.jpg',
             ],
-            stock: 0,
+            productSizes: [
+                { size: ProductSize.XS, stock: 6 },
+                { size: ProductSize.S,  stock: 0 },
+                { size: ProductSize.M,  stock: 7 },
+            ],
             price: 25,
-            sizes: ['XS','S','M'],
             slug: "kids_scribble_t_logo_tee",
             type: 'shirts',
             tags: ['shirt'],
@@ -711,9 +926,12 @@ export const initialData: SeedData = {
                 '8529342-00-A_0_2000.jpg',
                 '8529342-00-A_1.jpg',
             ],
-            stock: 10,
+            productSizes: [
+                { size: ProductSize.XS, stock: 7 },
+                { size: ProductSize.S,  stock: 9 },
+                { size: ProductSize.M,  stock: 8 },
+            ],
             price: 25,
-            sizes: ['XS','S','M'],
             slug: "kids_cybertruck_tee",
             type: 'shirts',
             tags: ['shirt'],
@@ -726,9 +944,12 @@ export const initialData: SeedData = {
                 '8529354-00-A_0_2000.jpg',
                 '8529354-00-A_1.jpg',
             ],
-            stock: 10,
+            productSizes: [
+                { size: ProductSize.XS, stock: 9 },
+                { size: ProductSize.S,  stock: 4 },
+                { size: ProductSize.M,  stock: 6 },
+            ],
             price: 30,
-            sizes: ['XS','S','M'],
             slug: "kids_racing_stripe_tee",
             type: 'shirts',
             tags: ['shirt'],
@@ -741,9 +962,12 @@ export const initialData: SeedData = {
                 '7652465-00-A_0_2000.jpg',
                 '7652465-00-A_1.jpg',
             ],
-            stock: 10,
+            productSizes: [
+                { size: ProductSize.XS, stock: 8 },
+                { size: ProductSize.S,  stock: 10 },
+                { size: ProductSize.M,  stock: 6 },
+            ],
             price: 30,
-            sizes: ['XS','S','M'],
             slug: "kids_3d_t_logo_tee",
             type: 'shirts',
             tags: ['shirt'],
@@ -756,9 +980,12 @@ export const initialData: SeedData = {
                 '100042307_0_2000.jpg',
                 '100042307_alt_2000.jpg',
             ],
-            stock: 10,
+            productSizes: [
+                { size: ProductSize.XS, stock: 7 },
+                { size: ProductSize.S,  stock: 9 },
+                { size: ProductSize.M,  stock: 8 },
+            ],
             price: 30,
-            sizes: ['XS','S','M'],
             slug: "kids_checkered_tee",
             type: 'shirts',
             tags: ['shirt'],
@@ -771,9 +998,11 @@ export const initialData: SeedData = {
                 '1473809-00-A_1_2000.jpg',
                 '1473809-00-A_alt.jpg',
             ],
-            stock: 16,
+            productSizes: [
+                { size: ProductSize.XS, stock: 6 },
+                { size: ProductSize.S,  stock: 9 }
+            ],
             price: 25,
-            sizes: ['XS','S'],
             slug: "made_on_earth_by_humans_onesie",
             type: 'shirts',
             tags: ['shirt'],
@@ -786,9 +1015,11 @@ export const initialData: SeedData = {
                 '8529387-00-A_0_2000.jpg',
                 '8529387-00-A_1.jpg',
             ],
-            stock: 0,
+            productSizes: [
+                { size: ProductSize.XS, stock: 0 },
+                { size: ProductSize.S,  stock: 0 }
+            ],
             price: 30,
-            sizes: ['XS','S'],
             slug: "scribble_t_logo_onesie",
             type: 'shirts',
             tags: ['shirt'],
@@ -801,9 +1032,12 @@ export const initialData: SeedData = {
                 '1473834-00-A_2_2000.jpg',
                 '1473829-00-A_2_2000.jpg',
             ],
-            stock: 10,
+            productSizes: [
+                { size: ProductSize.XS, stock: 6 },
+                { size: ProductSize.S,  stock: 9 },
+              
+            ],
             price: 30,
-            sizes: ['XS','S'],
             slug: "zero_emissions_(almost)_onesie",
             type: 'shirts',
             tags: ['shirt'],
@@ -816,9 +1050,12 @@ export const initialData: SeedData = {
                 '1742702-00-A_0_2000.jpg',
                 '1742702-00-A_1.jpg',
             ],
-            stock: 10,
+             productSizes: [
+                { size: ProductSize.XS, stock: 8 },
+                { size: ProductSize.S,  stock: 4 },
+                { size: ProductSize.M,  stock: 6 },
+            ],
             price: 65,
-            sizes: ['XS','S','M'],
             slug: "kids_cyberquad_bomber_jacket",
             type: 'shirts',
             tags: ['shirt'],
@@ -831,9 +1068,12 @@ export const initialData: SeedData = {
                 '1506211-00-A_0_2000.jpg',
                 '1506211-00-A_1_2000.jpg',
             ],
-            stock: 10,
+            productSizes: [
+                { size: ProductSize.XS, stock: 9 },
+                { size: ProductSize.S,  stock: 8 },
+                { size: ProductSize.M,  stock: 6 },
+            ],
             price: 30,
-            sizes: ['XS','S','M'],
             slug: "kids_corp_jacket",
             type: 'shirts',
             tags: ['shirt'],
