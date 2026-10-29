@@ -8,6 +8,7 @@ import { OrderStatus } from 'src/orders/enums/order-status.enum';
 import { plainToInstance } from 'class-transformer';
 import { PaginatedResponseDTO } from 'src/common/dtos/pagination-reponse.dto';
 import { Order } from 'src/orders/entities/order.entity';
+import { ProductSizeStock } from '../entities/product-size-stock.entity';
 
 @Injectable()
 export class AdminProductsService {
@@ -16,7 +17,8 @@ export class AdminProductsService {
 
     constructor(
         @InjectRepository(Product) private productsRepository: Repository<Product>,
-        @InjectRepository(OrderItem) private orderItemsRepository:Repository<OrderItem>
+        @InjectRepository(OrderItem) private orderItemsRepository:Repository<OrderItem>,
+        @InjectRepository(ProductSizeStock) private productSizeStockRepository:Repository<ProductSizeStock>
     ){}
 
     async getTopBestSellingProducts(limit=10):Promise<GetTopSellersResponseDTO>{
@@ -27,21 +29,24 @@ export class AdminProductsService {
                 "product.title AS title",
                 "product.slug AS slug",
                 "product.price AS price",
-                "product.stock AS stok"
-            ]).addSelect('SUM(orderItem.quantity)','unitsSold')
-            .addSelect('SUM(orderItem.quantity*orderItem.price)','totalRevenue')
-            .innerJoin(OrderItem, 'orderItem', 'orderItem.product.id = product.id')
+                "orderItem.selectedSize AS size"
+            ])
+            .addSelect('SUM(orderItem.quantity)', 'unitsSold')
+          
+            .addSelect('SUM(orderItem.quantity * orderItem.price)', 'totalRevenue')
+            .innerJoin(OrderItem, 'orderItem', 'orderItem.product_id = product.id')
             .innerJoin('orderItem.order', 'order', 'order.status = :status', { status: OrderStatus.PAID })
             .groupBy('product.id')
+            .addGroupBy('orderItem.selectedSize') 
             .orderBy('unitsSold', 'DESC') 
             .limit(limit)
             .getRawMany();
 
-            return{
-                message: `Top ${limit} best-selling produtcs`,
-                date: new Date(),
-                products: plainToInstance(TopSellerProductDTO,rawData)
-            }
+        return {
+            message: `Top ${limit} best-selling products by size`,
+            date: new Date(),
+            products: plainToInstance(TopSellerProductDTO, rawData)
+        };
             
 
         } catch (error) {
@@ -54,27 +59,29 @@ export class AdminProductsService {
     async getLowStockAlerts(threshold:number = 5, page:number =1, limit:number=5):Promise<PaginatedResponseDTO<LowStockProductDTO>>{
         try {
             const skip = (page-1)*limit;
-            const [products,total] = await this.productsRepository.createQueryBuilder('product')
-            .where('product.stock<=:threshold',{threshold})
-            .andWhere('product.isActive=:isActive',{isActive:true})
-            .orderBy('product.stock','ASC')
+             const [sizeStocks, total] = await this.productSizeStockRepository.createQueryBuilder('sizeStock')
+            .innerJoinAndSelect('sizeStock.product', 'product') 
+            .where('sizeStock.stock <= :threshold', { threshold })
+            .andWhere('product.isActive = :isActive', { isActive: true })
+            .orderBy('sizeStock.stock', 'ASC') 
             .skip(skip)
             .take(limit)
             .getManyAndCount();
 
-            return{
-                totalItems:products.length,
-                pageNumber:page,
-                pageSize:limit,
-                totalPages: Math.ceil(total / limit),
-                items:products.map(product=>({
-                    id:product.id,
-                    title:product.title,
-                    price:product.price,
-                    slug:product.slug,
-                    stock:product.stock
-                }))
-            }
+        return {
+            totalItems: total, 
+            pageNumber: page,
+            pageSize: limit,
+            totalPages: Math.ceil(total / limit),
+            items: sizeStocks.map(variant => ({
+                id: variant.product.id,
+                title: variant.product.title,
+                price: variant.product.price,
+                slug: variant.product.slug,
+                size: variant.size,  
+                stock: variant.stock  
+            }))
+        };
 
 
         } catch (error) {
@@ -86,36 +93,38 @@ export class AdminProductsService {
     
     async getDeadStock(daysAgo:number=30):Promise<DeadStockProductResponseDTO>{
         try {
-            const targetDate = new Date();
-            targetDate.setDate(targetDate.getDate()-daysAgo);
+              const targetDate = new Date();
+        targetDate.setDate(targetDate.getDate() - daysAgo);
 
-            const activeProductsQuery = await this.orderItemsRepository.createQueryBuilder('orderItem')
-            .select("DISTINCT orderItem.product.id")
-            .innerJoin(Order,'order','order.id = orderItem.order.id')
-            .where('order.status = :status',{status:OrderStatus.PAID})
-            .andWhere('order.createdAt>=targetDate',{targetDate})
+        
+        const activeVariantsQuery = this.orderItemsRepository.createQueryBuilder('orderItem')
+         
+            .select("CONCAT(orderItem.product_id, '_', orderItem.selected_size)")
+            .innerJoin('orderItem.order', 'order') 
+            .where('order.status = :status', { status: OrderStatus.PAID })
+            .andWhere('order.createdAt >= :targetDate', { targetDate });
 
-            //Bring those products that are not listed inthe previous sub query
-
-            const deadStockProducts = await this.productsRepository.createQueryBuilder('product')
-            .where(`product.id NOT IN (${activeProductsQuery.getQuery()})`)
-            .setParameters(activeProductsQuery.getParameters())
-            .andWhere('product.isActive =:isActive',{isActive:true})
-            .orderBy('product.stock','DESC')
+        
+        const deadVariants = await this.productSizeStockRepository.createQueryBuilder('sizeStock')
+            .innerJoinAndSelect('sizeStock.product', 'product') 
+            .where(`CONCAT(sizeStock.product_id, '_', sizeStock.size) NOT IN (${activeVariantsQuery.getQuery()})`)
+            .setParameters(activeVariantsQuery.getParameters()) // Heredamos el targetDate y status de la subconsulta
+            .andWhere('product.isActive = :isActive', { isActive: true })
+            .andWhere('sizeStock.stock > 0') 
+            .orderBy('sizeStock.stock', 'DESC') 
             .getMany();
-            
-            return {
-                message:`Getting the dead stock from the last ${daysAgo} days`,
-               products:deadStockProducts.map(product=>({
-                     id:product.id,
-                    title:product.title,
-                    price:product.price,
-                    slug:product.slug,
-                    stock:product.stock
-                }
-            ))
-            }
-            
+
+        return {
+            message: `Getting the dead stock from the last ${daysAgo} days`,
+            products: deadVariants.map(variant => ({
+                id: variant.product.id,
+                title: variant.product.title,
+                price: variant.product.price,
+                slug: variant.product.slug,
+                size: variant.size,   
+                stock: variant.stock  
+            }))
+        };
 
 
         } catch (error) {
