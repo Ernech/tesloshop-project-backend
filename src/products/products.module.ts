@@ -10,12 +10,13 @@ import { Product, ProductImage } from './entities';
 import { AdminProductsService } from './admin-products/admin-products.service';
 import { AdminProductsController } from './admin-products/admin-products.controller';
 import { OrderItem } from 'src/orders/entities/order-item.entity';
+import { ProductSizeStock } from './entities/product-size-stock.entity';
 
 @Module({
   controllers: [ProductsController, AdminProductsController],
   providers: [ProductsService, AdminProductsService],
   imports: [
-    TypeOrmModule.forFeature([ Product, ProductImage, OrderItem ]),
+    TypeOrmModule.forFeature([ Product, ProductImage, OrderItem, ProductSizeStock ]),
     AuthModule,
   ],
   exports: [
