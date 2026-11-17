@@ -58,28 +58,40 @@ export class ProductsService {
   }
 
   async findAll(paginationDto: ProductPaginationDto) {
-    const { limit = 10, page = 1, gender = '' } = paginationDto;
+    const { limit = 10, page = 1, gender, maxPrice,minPrice,categories,sizes } = paginationDto;
     const skip = (page -1)*limit;
-    const products = await this.productRepository.find({
-      take: limit,
-      skip: skip,
-      relations: {
-        images: true,
-        sizeStocks:true,
-      },
-      order: {
-        id: 'ASC',
-      },
-      where: gender ? [{ gender }, { gender: 'unisex' },{isActive:true}] : {isActive:true},
-    });
+    const productQuery = this.productRepository.createQueryBuilder("product")
+    .leftJoinAndSelect('product.sizeStocks', 'sizeStock')
+    .leftJoinAndSelect('product.images', 'productImage')
+    .select()
+    .where("product.isActive = :isActive",{isActive:true});
 
-    const totalProducts = await this.productRepository.count({
-      where: gender ? [{ gender }, { gender: 'unisex' }] : {},
-    });
-
+    if(gender){
+      productQuery.andWhere("product.gender=:gender",{gender})
+    }
+    if(minPrice!==undefined){
+      productQuery.andWhere("product.price>=:minPrice",{minPrice})
+    }
+    if(maxPrice!==undefined){
+      productQuery.andWhere("product.price<=:maxPrice",{maxPrice})
+    }
+    if (sizes && sizes.length > 0) {
+    productQuery
+      .innerJoin('product.sizeStocks', 'filterSizeStock')
+      .andWhere('filterSizeStock.size IN (:...sizes)', { sizes })
+      .andWhere('filterSizeStock.stock > 0');
+  }
+  if (categories && categories.length > 0) {
+    productQuery.andWhere('product.tags && :categories', { categories });
+  }
+  productQuery
+  .orderBy('product.createdAt', 'DESC')
+  .take(limit)
+  .skip(skip)
+  const [products, total] = await productQuery.getManyAndCount();
     return {
-      count: totalProducts,
-      pages: Math.ceil(totalProducts / limit),
+      count: total,
+      pages: Math.ceil(total / limit),
       products: products.map((product) => ({
         ...product,
         images: product.images.map((img) => img.url),

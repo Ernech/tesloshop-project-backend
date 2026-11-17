@@ -6,12 +6,13 @@ import { ProductSize } from "../enums/product-size.enum";
 
 
 export class ProductPaginationDto extends BasePaginationDto{
-   @ApiProperty({
+   @ApiPropertyOptional({
     default: '',
     description: 'Filter results by gender',
+    example:'men'
   })
   @IsOptional()
-  gender: 'men' | 'women' | 'unisex' | 'kid';
+  gender?: 'men' | 'women' | 'unisex' | 'kid';
 
    @ApiPropertyOptional({
     description: 'Filter results by a minimum price',
