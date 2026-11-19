@@ -58,7 +58,7 @@ export class ProductPaginationDto extends BasePaginationDto{
 
   @ApiPropertyOptional({
     default:[],
-    description:'Filter results by selected sizes (comma-separated or array)',
+    description:'Filter results by selected categories (comma-separated or array)',
     example:['hoodies','shirt']
   })
   @IsOptional()

@@ -82,7 +82,8 @@ export class ProductsService {
       .andWhere('filterSizeStock.stock > 0');
   }
   if (categories && categories.length > 0) {
-    productQuery.andWhere('product.tags && :categories', { categories });
+    const normalizedCategories = categories.map((c) => c.trim().toLowerCase());
+    productQuery.andWhere('product.tags && :categories::text[]', { categories:normalizedCategories });
   }
   productQuery
   .orderBy('product.createdAt', 'DESC')
